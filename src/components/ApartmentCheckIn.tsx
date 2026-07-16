@@ -123,10 +123,16 @@ export default function ApartmentCheckIn() {
       window.setTimeout(() => setCopiedKey(current => current === `photo:${index}` ? '' : current), 1800);
     } catch (error) {
       const reason = error instanceof Error && error.name ? ` (${error.name})` : '';
-      setCopyImageError(text(
-        `Không thể sao chép ảnh${reason}. Hãy chờ ảnh chuẩn bị xong rồi thử lại; nếu trình duyệt hỏi, hãy cho phép Clipboard.`,
-        `Could not copy the image${reason}. Wait until the image is prepared and try again; allow Clipboard if prompted.`,
-      ));
+      const corsBlocked = error instanceof TypeError;
+      setCopyImageError(corsBlocked
+        ? text(
+            'Firebase Storage chưa cho phép website đọc dữ liệu ảnh (CORS). Hãy bật CORS cho airbnb.khaitringuyen.com trong Cloud Storage rồi tải lại trang.',
+            'Firebase Storage has not allowed this website to read image data (CORS). Enable CORS for airbnb.khaitringuyen.com in Cloud Storage, then reload.',
+          )
+        : text(
+            `Không thể sao chép ảnh${reason}. Nếu trình duyệt hỏi, hãy cho phép Clipboard.`,
+            `Could not copy the image${reason}. Allow Clipboard if prompted.`,
+          ));
     } finally {
       setCopyingPhoto('');
     }

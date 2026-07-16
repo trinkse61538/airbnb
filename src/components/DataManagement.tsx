@@ -355,7 +355,7 @@ export default function DataManagement() {
           </div>
           <label className="relative block sm:w-72">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-            <input type="search" value={apartmentQuery} onChange={event => setApartmentQuery(event.target.value)} placeholder="Search apartment name…" className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-base text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white md:text-xs" />
+            <input type="search" value={apartmentQuery} onChange={event => setApartmentQuery(event.target.value)} placeholder="Search apartment name…" className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-base text-slate-800 caret-indigo-500 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:caret-indigo-300 dark:placeholder:text-slate-500 dark:focus:bg-slate-950 md:text-xs" />
           </label>
         </div>
         {apartments.length === 0 ? (
