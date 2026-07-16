@@ -16,12 +16,12 @@ import NotificationCenter from './components/NotificationCenter';
 import CleanerReminder from './components/CleanerReminder';
 import ApartmentWifi from './components/ApartmentWifi';
 import ApartmentCheckIn from './components/ApartmentCheckIn';
-import SetupGuide from './components/SetupGuide';
 import DataManagement from './components/DataManagement';
 import AccessBoundary from './components/AccessBoundary';
-import { InstallAppButton, NetworkStatus } from './components/PWAControls';
+import { NetworkStatus } from './components/PWAControls';
 import { useApartmentData } from './data/ApartmentDataProvider';
 import { publicUrl } from './utils/publicUrl';
+import { useUiLanguage } from './i18n';
 import { 
   RefreshCw, 
   AlertTriangle, 
@@ -53,7 +53,7 @@ interface CachedSnapshot {
   syncedAt: string;
 }
 
-type ActiveTab = 'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'manage' | 'setup';
+type ActiveTab = 'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'manage';
 
 function readCachedSnapshot(): CachedSnapshot | null {
   try {
@@ -67,6 +67,7 @@ function readCachedSnapshot(): CachedSnapshot | null {
 export default function App() {
   const cachedSnapshot = readCachedSnapshot();
   const { canEdit, role } = useApartmentData();
+  const { language, setLanguage, text } = useUiLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -105,7 +106,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const requestedTab = new URLSearchParams(window.location.search).get('tab');
-    return ['apartments', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'manage', 'setup'].includes(requestedTab || '')
+    return ['apartments', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'manage'].includes(requestedTab || '')
       ? requestedTab as ActiveTab
       : 'apartments';
   });
@@ -323,19 +324,22 @@ export default function App() {
               <h1 className={`text-xs sm:text-lg font-bold font-display tracking-tight flex items-center gap-1.5 leading-none truncate ${
                 darkMode ? 'text-white' : 'text-slate-900'
               }`}>
-                Apartment Inventory <span className={`hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded-md font-semibold border font-sans ${
+                {text('Quản lý căn hộ', 'Apartment Inventory')} <span className={`hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded-md font-semibold border font-sans ${
                   darkMode ? 'bg-indigo-950/50 text-indigo-300 border-indigo-900/50' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
-                }`}>v3.0.2 PWA</span>
+                }`}>v3.0.3 PWA</span>
               </h1>
               <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 truncate hidden sm:block ${
                 darkMode ? 'text-slate-400' : 'text-slate-500'
-              }`}>Aggregate status and dispatch alerts</p>
+              }`}>{text('Theo dõi tồn kho, Wi-Fi và hướng dẫn nhận phòng', 'Aggregate status and dispatch alerts')}</p>
             </div>
           </div>
 
           {/* Right side Header buttons */}
           <div className="flex items-center gap-2 sm:gap-3 ml-auto shrink-0">
-            <InstallAppButton compact />
+            <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800" aria-label={text('Chọn ngôn ngữ', 'Choose language')}>
+              <button type="button" onClick={() => setLanguage('vi')} title="Tiếng Việt" aria-label="Tiếng Việt" className={`rounded-lg px-2 py-1.5 text-sm transition ${language === 'vi' ? 'bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600' : 'opacity-45 hover:opacity-100'}`}>🇻🇳</button>
+              <button type="button" onClick={() => setLanguage('en')} title="English" aria-label="English" className={`rounded-lg px-2 py-1.5 text-sm transition ${language === 'en' ? 'bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-700 dark:ring-slate-600' : 'opacity-45 hover:opacity-100'}`}>🇬🇧</button>
+            </div>
             {/* Dark Mode toggle button */}
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -482,7 +486,7 @@ export default function App() {
                   darkMode ? 'text-indigo-400' : 'text-indigo-700'
                 }`}>
                   <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                  Mục Quản Lý Chính (Apartment Control Center Tabs)
+                  {text('Mục quản lý chính', 'Main management')}
                 </span>
               </div>
               <div className={`p-3 rounded-2xl border-2 transition-all duration-200 grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-3 ${
@@ -599,25 +603,6 @@ export default function App() {
                   </span>
                 </button>
 
-                <button
-                  onClick={() => setActiveTab('setup')}
-                  id="tab-setup"
-                  className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-150 cursor-pointer border select-none focus:outline-none active:scale-95 shadow-xs ${
-                    activeTab === 'setup'
-                      ? 'bg-gradient-to-r from-slate-600 to-slate-700 text-white border-slate-500 shadow-md shadow-slate-500/20 scale-[1.03]'
-                      : darkMode
-                        ? 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400 hover:text-slate-900 shadow-sm'
-                  }`}
-                >
-                  <Smartphone className={`w-4 h-4 shrink-0 transition-colors ${
-                    activeTab === 'setup' ? 'text-white' : 'text-slate-500 dark:text-slate-450'
-                  }`} />
-                  <span className="truncate">
-                    <span className="inline md:hidden">Setup</span>
-                    <span className="hidden md:inline">Install & Phone Automation</span>
-                  </span>
-                </button>
                 {canEdit && (
                   <button
                     onClick={() => setActiveTab('manage')}
@@ -844,10 +829,8 @@ export default function App() {
                   <ApartmentWifi />
                 ) : activeTab === 'checkin' ? (
                   <ApartmentCheckIn />
-                ) : activeTab === 'manage' ? (
-                  <DataManagement />
                 ) : (
-                  <SetupGuide currentSpreadsheetId={currentSheetId || ''} />
+                  <DataManagement />
                 )
               )}
             </div>
