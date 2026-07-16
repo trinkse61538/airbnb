@@ -26,6 +26,7 @@ export default function ApartmentCheckIn() {
   const [copyingPhoto, setCopyingPhoto] = useState('');
   const [copyImageError, setCopyImageError] = useState('');
   const [preparedPhotoUrls, setPreparedPhotoUrls] = useState<Set<string>>(() => new Set());
+  const [failedPhotoUrls, setFailedPhotoUrls] = useState<Set<string>>(() => new Set());
   const pngClipboardCache = useRef<Map<string, Blob>>(new Map());
   const records = data?.checkin ?? [];
 
@@ -74,7 +75,7 @@ export default function ApartmentCheckIn() {
             setPreparedPhotoUrls(new Set(pngClipboardCache.current.keys()));
           }
         } catch {
-          // Display can still work even if this browser blocks image fetching.
+          if (!cancelled) setFailedPhotoUrls(current => new Set(current).add(photo.url));
         }
       }));
       if (!cancelled) setPreparedPhotoUrls(new Set(pngClipboardCache.current.keys()));
@@ -97,8 +98,22 @@ export default function ApartmentCheckIn() {
       if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
         throw new Error('Clipboard image copying is not supported by this browser.');
       }
-      const png = pngClipboardCache.current.get(photo.url);
-      if (!png) throw new Error('The image is not ready for copying yet.');
+      let png = pngClipboardCache.current.get(photo.url);
+      if (!png) {
+        png = await fetchImageAsPng(photo.url);
+        pngClipboardCache.current.set(photo.url, png);
+        setPreparedPhotoUrls(new Set(pngClipboardCache.current.keys()));
+        setFailedPhotoUrls(current => {
+          const next = new Set(current);
+          next.delete(photo.url);
+          return next;
+        });
+        setCopyImageError(text(
+          'Ảnh đã được chuẩn bị xong. Hãy bấm Sao chép ảnh thêm một lần nữa.',
+          'The image is ready. Click Copy image once more.',
+        ));
+        return;
+      }
       // The PNG is already in memory, so clipboard.write runs directly inside
       // the click action without losing transient browser permission.
       await navigator.clipboard.write([
@@ -120,7 +135,7 @@ export default function ApartmentCheckIn() {
   if (!activeRecord) return null;
 
   const fullStepText = displayedSteps
-    .map((step, index) => `STEP ${index + 1}\n${stripMarkdown(step)}`)
+    .map((step, index) => `${language === 'vi' ? 'BƯỚC' : 'STEP'} ${index + 1}\n${stripMarkdown(step)}`)
     .join('\n\n');
 
   return (
@@ -254,9 +269,9 @@ export default function ApartmentCheckIn() {
                   </button>
                   <div className="space-y-2 p-2.5">
                     <p className="line-clamp-2 min-h-8 text-[9px] leading-4 text-slate-600 dark:text-slate-400">{photo.caption}</p>
-                    <button type="button" onClick={() => void copyPhoto(photo, index)} disabled={copyingPhoto === photo.url || !preparedPhotoUrls.has(photo.url)} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                    <button type="button" onClick={() => void copyPhoto(photo, index)} disabled={copyingPhoto === photo.url || (!preparedPhotoUrls.has(photo.url) && !failedPhotoUrls.has(photo.url))} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                       {copiedKey === `photo:${index}` ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-                      {!preparedPhotoUrls.has(photo.url) ? text('Đang chuẩn bị ảnh…', 'Preparing image…') : copyingPhoto === photo.url ? text('Đang sao chép…', 'Copying…') : copiedKey === `photo:${index}` ? text('Đã sao chép ảnh', 'Image copied') : text('Sao chép ảnh', 'Copy image')}
+                      {failedPhotoUrls.has(photo.url) ? text('Thử chuẩn bị lại', 'Retry preparing') : !preparedPhotoUrls.has(photo.url) ? text('Đang chuẩn bị ảnh…', 'Preparing image…') : copyingPhoto === photo.url ? text('Đang sao chép…', 'Copying…') : copiedKey === `photo:${index}` ? text('Đã sao chép ảnh', 'Image copied') : text('Sao chép ảnh', 'Copy image')}
                     </button>
                   </div>
                 </article>
@@ -271,9 +286,15 @@ export default function ApartmentCheckIn() {
               <h3 className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white"><Sparkles className="h-4 w-4 text-amber-500" /> Step-by-step guest message</h3>
               <p className="mt-1 text-[9px] text-slate-400">Choose one language before copying the guide.</p>
             </div>
-            <span className="rounded-xl bg-slate-100 px-3 py-2 text-[10px] font-extrabold text-indigo-700 dark:bg-slate-950 dark:text-indigo-300">
-              {language === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-xl bg-slate-100 px-3 py-2 text-[10px] font-extrabold text-indigo-700 dark:bg-slate-950 dark:text-indigo-300">
+                {language === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}
+              </span>
+              <button type="button" onClick={() => void copyText('all-steps', fullStepText || activeRecord.instructions)} disabled={!fullStepText && !activeRecord.instructions} className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 text-[10px] font-extrabold text-white transition hover:bg-indigo-700 disabled:opacity-40">
+                {copiedKey === 'all-steps' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiedKey === 'all-steps' ? text('Đã sao chép tất cả', 'All steps copied') : text('Sao chép tất cả bước', 'Copy all steps')}
+              </button>
+            </div>
           </div>
 
           {displayedSteps.length > 0 ? (
@@ -317,19 +338,26 @@ async function fetchImageAsPng(url: string): Promise<Blob> {
   const response = await fetch(url);
   if (!response.ok) throw new Error('Image download failed.');
   const source = await response.blob();
-  if (source.type === 'image/png') return source;
-
-  const bitmap = await createImageBitmap(source);
-  const canvas = document.createElement('canvas');
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
-  const context = canvas.getContext('2d');
-  if (!context) throw new Error('Image conversion failed.');
-  context.drawImage(bitmap, 0, 0);
-  bitmap.close();
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG conversion failed.')), 'image/png');
-  });
+  const objectUrl = URL.createObjectURL(source);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error('The browser could not decode this image.'));
+      element.src = objectUrl;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Image conversion failed.');
+    context.drawImage(image, 0, 0);
+    return await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG conversion failed.')), 'image/png');
+    });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 function QuickDetail({ label, value, copied, onCopy }: { label: string; value: string; copied: boolean; onCopy: () => void }) {

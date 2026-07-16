@@ -11,6 +11,7 @@ import {
   Pencil,
   Plus,
   Save,
+  Search,
   ShieldCheck,
   Trash2,
   UserPlus,
@@ -56,6 +57,14 @@ function textToSteps(value: string): string[] {
     .filter(Boolean);
 }
 
+function normalizeSearch(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .trim();
+}
+
 export default function DataManagement() {
   const { apartments, accessAccounts, canEdit, isAdmin, role, user } = useApartmentData();
   const [working, setWorking] = useState<ManagedApartment | null>(null);
@@ -68,6 +77,7 @@ export default function DataManagement() {
   const [newRole, setNewRole] = useState<AccessRole>('editor');
   const [accessSaving, setAccessSaving] = useState('');
   const [legacyKey, setLegacyKey] = useState('');
+  const [apartmentQuery, setApartmentQuery] = useState('');
   const [migrationMessage, setMigrationMessage] = useState('');
   const [migrationPercent, setMigrationPercent] = useState(0);
   const [migrating, setMigrating] = useState(false);
@@ -85,6 +95,11 @@ export default function DataManagement() {
     () => apartments.reduce((sum, apartment) => sum + apartment.photos.length, 0),
     [apartments],
   );
+  const filteredApartments = useMemo(() => {
+    const normalizedQuery = normalizeSearch(apartmentQuery);
+    if (!normalizedQuery) return apartments;
+    return apartments.filter(apartment => normalizeSearch(apartment.apartment).includes(normalizedQuery));
+  }, [apartmentQuery, apartments]);
 
   const openEditor = (apartment?: ManagedApartment) => {
     pendingPhotos.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
@@ -333,15 +348,23 @@ export default function DataManagement() {
       )}
 
       <section className="rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="border-b border-slate-100 p-4 dark:border-slate-800 sm:p-5">
-          <h3 className="text-xs font-extrabold text-slate-900 dark:text-white">Danh sách căn hộ</h3>
-          <p className="mt-1 text-[9px] text-slate-400">Edit Wi-Fi, lockbox and guest instructions from one record.</p>
+        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div>
+            <h3 className="text-xs font-extrabold text-slate-900 dark:text-white">Danh sách căn hộ</h3>
+            <p className="mt-1 text-[9px] text-slate-400">Edit Wi-Fi, lockbox and guest instructions from one record.</p>
+          </div>
+          <label className="relative block sm:w-72">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <input type="search" value={apartmentQuery} onChange={event => setApartmentQuery(event.target.value)} placeholder="Search apartment name…" className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-base text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white md:text-xs" />
+          </label>
         </div>
         {apartments.length === 0 ? (
           <div className="p-10 text-center text-xs text-slate-400">No apartment data yet. Import the existing package or add a new apartment.</div>
+        ) : filteredApartments.length === 0 ? (
+          <div className="p-10 text-center text-xs text-slate-400">Không tìm thấy căn hộ phù hợp với “{apartmentQuery}”.</div>
         ) : (
           <div className="grid gap-3 p-3 md:grid-cols-2 xl:grid-cols-3 sm:p-4">
-            {apartments.map(apartment => (
+            {filteredApartments.map(apartment => (
               <article key={apartment.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/60">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
