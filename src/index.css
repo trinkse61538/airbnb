@@ -39,6 +39,42 @@ html.dark {
   background: #020617;
 }
 
+/* Keep every form control readable when the app's manual dark mode is on.
+   This intentionally overrides legacy focus:bg-white utilities across all
+   inventory, notification, cleaner, Wi-Fi, check-in and management screens. */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark textarea,
+html.dark select {
+  color-scheme: dark;
+  background-color: #020617 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+  caret-color: #a5b4fc !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  background-color: #020617 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.18);
+}
+
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #a5b4fc !important;
+  box-shadow: 0 0 0 1000px #020617 inset !important;
+}
+
 body {
   min-width: 320px;
   min-height: 100dvh;
