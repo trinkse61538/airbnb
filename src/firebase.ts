@@ -6,7 +6,9 @@ import firebaseConfig from '../firebase-applet-config.json';
 
 export const app = initializeApp(firebaseConfig);
 export const auth: Auth = getAuth(app);
-export const db = getFirestore(app);
+// This Firebase project uses the named Firestore database created in Console.
+// Keep this in sync with the database selector shown on the Firestore page.
+export const db = getFirestore(app, 'airbnb');
 export const storage = getStorage(app);
 
 const provider = new GoogleAuthProvider();
