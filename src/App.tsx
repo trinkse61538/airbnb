@@ -326,7 +326,7 @@ export default function App() {
               }`}>
                 {text('Quản lý căn hộ', 'Apartment Inventory')} <span className={`hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded-md font-semibold border font-sans ${
                   darkMode ? 'bg-indigo-950/50 text-indigo-300 border-indigo-900/50' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
-                }`}>v3.0.5 PWA</span>
+                }`}>v3.0.6 PWA</span>
               </h1>
               <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 truncate hidden sm:block ${
                 darkMode ? 'text-slate-400' : 'text-slate-500'
