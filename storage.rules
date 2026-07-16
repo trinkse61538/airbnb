@@ -11,12 +11,12 @@ service firebase.storage {
     }
 
     function accessDocument() {
-      return firestore.get(/databases/(default)/documents/access/$(request.auth.token.email.lower()));
+      return firestore.get(/databases/airbnb/documents/access/$(request.auth.token.email.lower()));
     }
 
     function hasAccess() {
       return signedIn()
-        && firestore.exists(/databases/(default)/documents/access/$(request.auth.token.email.lower()))
+        && firestore.exists(/databases/airbnb/documents/access/$(request.auth.token.email.lower()))
         && accessDocument().data.active == true;
     }
 

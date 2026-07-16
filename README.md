@@ -47,11 +47,11 @@ Use the Firebase project referenced by `firebase-applet-config.json`.
 
 1. Enable Google in **Authentication → Sign-in method**.
 2. Add both `trinkse61538.github.io` and `airbnb.khaitringuyen.com` under **Authentication → Settings → Authorised domains**.
-3. Create a Cloud Firestore database in production mode.
+3. Create the named Cloud Firestore database `airbnb` in production mode. The app explicitly connects to this database ID.
 4. Open Firestore **Rules**, paste `firestore.rules`, then publish.
 5. Create the default Cloud Storage bucket.
 6. Open Storage **Rules**, paste `storage.rules`, then publish.
-7. When Firebase asks to allow Storage Rules to read Firestore access documents, approve the connection.
+7. When Firebase asks to allow Storage Rules to read Firestore access documents, approve the connection. The included Storage rules read access documents from the named `airbnb` database.
 
 The same rules can be deployed with Firebase CLI after signing in:
 
@@ -108,4 +108,3 @@ The inventory spreadsheet is read through Google OAuth. A user must have permiss
 - Do not commit the plaintext private data ZIP or previous access key.
 - A Hotmail address can use the Google button only when that address is registered as a Google Account. Microsoft sign-in can be added later if needed.
 - Keep `khaitri15@gmail.com` under your control because it is the permanent bootstrap admin in the included rules.
-
