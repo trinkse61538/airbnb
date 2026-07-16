@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Check,
   ChevronRight,
@@ -25,6 +25,8 @@ export default function ApartmentCheckIn() {
   const [selectedPhoto, setSelectedPhoto] = useState<CheckInPhoto | null>(null);
   const [copyingPhoto, setCopyingPhoto] = useState('');
   const [copyImageError, setCopyImageError] = useState('');
+  const [preparedPhotoUrls, setPreparedPhotoUrls] = useState<Set<string>>(() => new Set());
+  const pngClipboardCache = useRef<Map<string, Blob>>(new Map());
   const records = data?.checkin ?? [];
 
   useEffect(() => {
@@ -59,6 +61,28 @@ export default function ApartmentCheckIn() {
   const enSteps = activeRecord ? data?.instructionsEn[activeRecord.id] ?? [] : [];
   const displayedSteps = buildSteps(language, viSteps, enSteps);
 
+  useEffect(() => {
+    if (!activeRecord) return;
+    let cancelled = false;
+    const preparePhotos = async () => {
+      await Promise.all(activeRecord.photos.map(async photo => {
+        if (!photo.url || pngClipboardCache.current.has(photo.url)) return;
+        try {
+          const png = await fetchImageAsPng(photo.url);
+          if (!cancelled) {
+            pngClipboardCache.current.set(photo.url, png);
+            setPreparedPhotoUrls(new Set(pngClipboardCache.current.keys()));
+          }
+        } catch {
+          // Display can still work even if this browser blocks image fetching.
+        }
+      }));
+      if (!cancelled) setPreparedPhotoUrls(new Set(pngClipboardCache.current.keys()));
+    };
+    void preparePhotos();
+    return () => { cancelled = true; };
+  }, [activeRecord]);
+
   const copyText = async (key: string, text: string) => {
     await navigator.clipboard.writeText(text);
     setCopiedKey(key);
@@ -73,17 +97,20 @@ export default function ApartmentCheckIn() {
       if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
         throw new Error('Clipboard image copying is not supported by this browser.');
       }
-      // Start clipboard.write during the click event. Passing a Promise keeps
-      // browser activation while the Firebase image is fetched and converted.
+      const png = pngClipboardCache.current.get(photo.url);
+      if (!png) throw new Error('The image is not ready for copying yet.');
+      // The PNG is already in memory, so clipboard.write runs directly inside
+      // the click action without losing transient browser permission.
       await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': fetchImageAsPng(photo.url) }),
+        new ClipboardItem({ 'image/png': png }),
       ]);
       setCopiedKey(`photo:${index}`);
       window.setTimeout(() => setCopiedKey(current => current === `photo:${index}` ? '' : current), 1800);
-    } catch {
+    } catch (error) {
+      const reason = error instanceof Error && error.name ? ` (${error.name})` : '';
       setCopyImageError(text(
-        'Không thể sao chép ảnh. Hãy mở website bằng Chrome/Safari qua HTTPS và cho phép Clipboard.',
-        'Could not copy the image. Open the HTTPS site in Chrome/Safari and allow Clipboard access.',
+        `Không thể sao chép ảnh${reason}. Hãy chờ ảnh chuẩn bị xong rồi thử lại; nếu trình duyệt hỏi, hãy cho phép Clipboard.`,
+        `Could not copy the image${reason}. Wait until the image is prepared and try again; allow Clipboard if prompted.`,
       ));
     } finally {
       setCopyingPhoto('');
@@ -227,9 +254,9 @@ export default function ApartmentCheckIn() {
                   </button>
                   <div className="space-y-2 p-2.5">
                     <p className="line-clamp-2 min-h-8 text-[9px] leading-4 text-slate-600 dark:text-slate-400">{photo.caption}</p>
-                    <button type="button" onClick={() => void copyPhoto(photo, index)} disabled={copyingPhoto === photo.url} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                    <button type="button" onClick={() => void copyPhoto(photo, index)} disabled={copyingPhoto === photo.url || !preparedPhotoUrls.has(photo.url)} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                       {copiedKey === `photo:${index}` ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-                      {copyingPhoto === photo.url ? text('Đang sao chép…', 'Copying…') : copiedKey === `photo:${index}` ? text('Đã sao chép ảnh', 'Image copied') : text('Sao chép ảnh', 'Copy image')}
+                      {!preparedPhotoUrls.has(photo.url) ? text('Đang chuẩn bị ảnh…', 'Preparing image…') : copyingPhoto === photo.url ? text('Đang sao chép…', 'Copying…') : copiedKey === `photo:${index}` ? text('Đã sao chép ảnh', 'Image copied') : text('Sao chép ảnh', 'Copy image')}
                     </button>
                   </div>
                 </article>
