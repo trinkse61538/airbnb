@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import type { User } from 'firebase/auth';
@@ -16,7 +15,7 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
-import { getBlob, ref } from 'firebase/storage';
+import { getDownloadURL, ref } from 'firebase/storage';
 import { auth, db, storage } from '../firebase';
 import type { SecurePayload } from '../secure/types';
 import { INITIAL_ACCESS_ACCOUNTS, PRIMARY_ADMIN_EMAIL, normalizeEmail } from './accessConfig';
@@ -156,7 +155,6 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
   const [apartments, setApartments] = useState<ManagedApartment[]>([]);
   const [accessAccounts, setAccessAccounts] = useState<AccessAccount[]>([]);
   const [error, setError] = useState('');
-  const objectUrlsRef = useRef<Map<string, string>>(new Map());
 
   useEffect(() => auth.onAuthStateChanged(nextUser => {
     setUser(nextUser);
@@ -244,12 +242,10 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
           const hydrated = await Promise.all(rawApartments.map(async apartment => {
             const photos = await Promise.all(apartment.photos.map(async photo => {
               if (!photo.storagePath) return photo;
-              const cachedUrl = objectUrlsRef.current.get(photo.storagePath);
-              if (cachedUrl) return { ...photo, url: cachedUrl };
               try {
-                const blob = await getBlob(ref(storage, photo.storagePath));
-                const url = URL.createObjectURL(blob);
-                objectUrlsRef.current.set(photo.storagePath, url);
+                // Download URLs render reliably in <img> without requiring the
+                // browser CORS setup needed by getBlob().
+                const url = await getDownloadURL(ref(storage, photo.storagePath));
                 return { ...photo, url };
               } catch {
                 return { ...photo, url: '' };
@@ -305,11 +301,6 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
       snapshotError => setError(friendlyFirebaseError(snapshotError)),
     );
   }, [role, user]);
-
-  useEffect(() => () => {
-    objectUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
-    objectUrlsRef.current.clear();
-  }, []);
 
   const data = useMemo(() => role ? toSecurePayload(apartments) : null, [apartments, role]);
   const value = useMemo<ApartmentDataContextValue>(() => ({
