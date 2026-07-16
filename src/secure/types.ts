@@ -9,6 +9,7 @@ export interface WifiCredential {
 export interface CheckInPhoto {
   url: string;
   caption: string;
+  storagePath?: string;
 }
 
 export interface CheckInRecord {
