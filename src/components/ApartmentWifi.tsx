@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Check,
   Copy,
-  Eye,
-  EyeOff,
   KeyRound,
   Search,
   ShieldCheck,
@@ -16,17 +14,8 @@ type CopyType = 'all' | 'ssid' | 'password';
 export default function ApartmentWifi() {
   const { data } = useApartmentData();
   const [query, setQuery] = useState('');
-  const [revealPasswords, setRevealPasswords] = useState(false);
   const [copiedKey, setCopiedKey] = useState('');
   const wifiRecords = data?.wifi ?? [];
-
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) setRevealPasswords(false);
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);
 
   const filteredRecords = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -72,14 +61,6 @@ export default function ApartmentWifi() {
                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-base text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:ring-indigo-950 md:text-xs"
               />
             </label>
-            <button
-              type="button"
-              onClick={() => setRevealPasswords(value => !value)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-extrabold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              {revealPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {revealPasswords ? 'Hide passwords' : 'Show passwords'}
-            </button>
           </div>
         </div>
       </section>
@@ -112,7 +93,6 @@ export default function ApartmentWifi() {
                   <CredentialRow
                     label="Password"
                     value={record.password || 'Not available'}
-                    masked={!revealPasswords && !!record.password}
                     copied={copiedKey === `${record.id}:password`}
                     onCopy={() => void copy(record.id, record.password || '', 'password')}
                   />
@@ -148,13 +128,11 @@ export default function ApartmentWifi() {
 function CredentialRow({
   label,
   value,
-  masked = false,
   copied,
   onCopy,
 }: {
   label: string;
   value: string;
-  masked?: boolean;
   copied: boolean;
   onCopy: () => void;
 }) {
@@ -162,9 +140,7 @@ function CredentialRow({
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/70">
       <div className="min-w-0">
         <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-        <p className={`mt-1 truncate font-mono text-xs font-bold text-slate-800 dark:text-slate-200 ${masked ? 'tracking-[0.2em]' : ''}`}>
-          {masked ? '••••••••••••' : value}
-        </p>
+        <p className="mt-1 truncate font-mono text-xs font-bold text-slate-800 dark:text-slate-200">{value}</p>
       </div>
       <button
         type="button"

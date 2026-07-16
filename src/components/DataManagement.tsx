@@ -438,10 +438,27 @@ function ApartmentEditor({ working, pendingPhotos, saving, onUpdate, onUpdateExi
           <Field label="Wi-Fi note" value={working.wifiNote} onChange={value => onUpdate('wifiNote', value)} wide />
         </FormSection>
         <FormSection title="Guest instructions">
-          <TextArea label="Original/general instruction" value={working.instructions} onChange={value => onUpdate('instructions', value)} />
-          <TextArea label="Vietnamese steps · separate steps with a blank line" value={viText} onChange={value => { setViText(value); onUpdate('instructionsVi', textToSteps(value)); }} />
-          <TextArea label="English steps · separate steps with a blank line" value={enText} onChange={value => { setEnText(value); onUpdate('instructionsEn', textToSteps(value)); }} />
-          <TextArea label="Internal notes" value={working.notes} onChange={value => onUpdate('notes', value)} />
+          <div className="col-span-full rounded-xl border border-indigo-100 bg-indigo-50/70 p-3 text-[10px] leading-5 text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950/30 dark:text-indigo-300">
+            Nội dung ở ô <strong>Tiếng Việt</strong> sẽ được dùng khi chọn 🇻🇳 VI và bấm Copy. Nội dung ở ô <strong>English</strong> sẽ được dùng khi chọn 🇬🇧 EN. Mỗi bước cách nhau bằng một dòng trống.
+          </div>
+          <TextArea
+            label="🇻🇳 HƯỚNG DẪN TIẾNG VIỆT · nội dung để Copy VI"
+            helper="Nhập từng bước bằng tiếng Việt; chừa một dòng trống giữa hai bước."
+            placeholder={'Ví dụ:\nĐi đến hộp khóa cạnh cửa chính.\n\nNhập mã hộp khóa và lấy chìa khóa.'}
+            value={viText}
+            tone="vi"
+            onChange={value => { setViText(value); onUpdate('instructionsVi', textToSteps(value)); }}
+          />
+          <TextArea
+            label="🇬🇧 ENGLISH INSTRUCTIONS · content used for Copy EN"
+            helper="Enter each step in English; leave one blank line between steps."
+            placeholder={'Example:\nGo to the lockbox beside the main entrance.\n\nEnter the lockbox code and collect the key.'}
+            value={enText}
+            tone="en"
+            onChange={value => { setEnText(value); onUpdate('instructionsEn', textToSteps(value)); }}
+          />
+          <TextArea label="Thông tin hướng dẫn chung / bản gốc" helper="Chỉ dùng làm nội dung dự phòng nếu chưa nhập hướng dẫn theo ngôn ngữ ở trên." value={working.instructions} onChange={value => onUpdate('instructions', value)} />
+          <TextArea label="Ghi chú nội bộ" helper="Chỉ dành cho người quản lý; không nằm trong nội dung Copy cho khách." value={working.notes} onChange={value => onUpdate('notes', value)} />
         </FormSection>
         <FormSection title="Check-in photos">
           <div className="col-span-full grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -470,8 +487,14 @@ function Field({ label, value, onChange, wide = false }: { label: string; value:
   return <label className={wide ? 'md:col-span-2' : ''}><span className="mb-1.5 block text-[9px] font-bold text-slate-500 dark:text-slate-400">{label}</span><input value={value} onChange={event => onChange(event.target.value)} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-base text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white md:text-xs" /></label>;
 }
 
-function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label><span className="mb-1.5 block text-[9px] font-bold text-slate-500 dark:text-slate-400">{label}</span><textarea value={value} onChange={event => onChange(event.target.value)} rows={7} className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-base leading-5 text-slate-800 outline-none transition focus:border-indigo-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white md:text-xs" /></label>;
+function TextArea({ label, helper, placeholder, value, onChange, tone = 'default' }: { label: string; helper?: string; placeholder?: string; value: string; onChange: (value: string) => void; tone?: 'default' | 'vi' | 'en' }) {
+  const toneClass = tone === 'vi'
+    ? 'border-rose-200 bg-rose-50/40 focus:border-rose-500 dark:border-rose-900 dark:bg-rose-950/20'
+    : tone === 'en'
+      ? 'border-blue-200 bg-blue-50/40 focus:border-blue-500 dark:border-blue-900 dark:bg-blue-950/20'
+      : 'border-slate-200 bg-slate-50 focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-950';
+  const labelClass = tone === 'vi' ? 'text-rose-700 dark:text-rose-300' : tone === 'en' ? 'text-blue-700 dark:text-blue-300' : 'text-slate-500 dark:text-slate-400';
+  return <label><span className={`mb-1 block text-[10px] font-extrabold ${labelClass}`}>{label}</span>{helper && <span className="mb-2 block text-[9px] leading-4 text-slate-400">{helper}</span>}<textarea value={value} placeholder={placeholder} onChange={event => onChange(event.target.value)} rows={8} className={`w-full resize-y rounded-xl border p-3 text-base leading-5 text-slate-800 outline-none transition focus:bg-white dark:text-white md:text-xs ${toneClass}`} /></label>;
 }
 
 function PhotoEditor({ src, caption, onCaption, onRemove, isNew = false }: { key?: string; src: string; caption: string; onCaption: (value: string) => void; onRemove: () => void; isNew?: boolean }) {
