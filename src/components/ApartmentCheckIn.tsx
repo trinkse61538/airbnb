@@ -9,23 +9,22 @@ import {
   KeyRound,
   MapPin,
   Search,
-  Share2,
   Sparkles,
   X,
 } from 'lucide-react';
 import { useApartmentData } from '../data/ApartmentDataProvider';
 import { CheckInPhoto } from '../secure/types';
-
-type Language = 'vi' | 'en' | 'bilingual';
+import { useUiLanguage } from '../i18n';
 
 export default function ApartmentCheckIn() {
   const { data } = useApartmentData();
+  const { language, text } = useUiLanguage();
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState('');
-  const [language, setLanguage] = useState<Language>('bilingual');
   const [copiedKey, setCopiedKey] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState<CheckInPhoto | null>(null);
-  const [sharingPhoto, setSharingPhoto] = useState('');
+  const [copyingPhoto, setCopyingPhoto] = useState('');
+  const [copyImageError, setCopyImageError] = useState('');
   const records = data?.checkin ?? [];
 
   useEffect(() => {
@@ -66,29 +65,28 @@ export default function ApartmentCheckIn() {
     window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
   };
 
-  const sharePhoto = async (photo: CheckInPhoto, index: number) => {
+  const copyPhoto = async (photo: CheckInPhoto, index: number) => {
     if (!photo.url) return;
-    setSharingPhoto(photo.url);
+    setCopyingPhoto(photo.url);
+    setCopyImageError('');
     try {
-      const response = await fetch(photo.url);
-      const blob = await response.blob();
-      const extension = blob.type.includes('png') ? 'png' : 'jpg';
-      const file = new File([blob], `check-in-step-${index + 1}.${extension}`, { type: blob.type || 'image/jpeg' });
-
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `Check-in step ${index + 1}`, text: photo.caption });
-      } else if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-        setCopiedKey(`photo:${index}`);
-        window.setTimeout(() => setCopiedKey(''), 1800);
-      } else {
-        const link = document.createElement('a');
-        link.href = photo.url;
-        link.download = file.name;
-        link.click();
+      if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+        throw new Error('Clipboard image copying is not supported by this browser.');
       }
+      // Start clipboard.write during the click event. Passing a Promise keeps
+      // browser activation while the Firebase image is fetched and converted.
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': fetchImageAsPng(photo.url) }),
+      ]);
+      setCopiedKey(`photo:${index}`);
+      window.setTimeout(() => setCopiedKey(current => current === `photo:${index}` ? '' : current), 1800);
+    } catch {
+      setCopyImageError(text(
+        'Không thể sao chép ảnh. Hãy mở website bằng Chrome/Safari qua HTTPS và cho phép Clipboard.',
+        'Could not copy the image. Open the HTTPS site in Chrome/Safari and allow Clipboard access.',
+      ));
     } finally {
-      setSharingPhoto('');
+      setCopyingPhoto('');
     }
   };
 
@@ -212,9 +210,10 @@ export default function ApartmentCheckIn() {
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <h3 className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white"><ImageIcon className="h-4 w-4 text-indigo-500" /> Visual walkthrough</h3>
-                <p className="mt-1 text-[9px] text-slate-400">Tap an image to enlarge. Use Share on mobile to send it directly.</p>
+                <p className="mt-1 text-[9px] text-slate-400">{text('Chạm vào ảnh để phóng to. Bấm Sao chép ảnh để dán trực tiếp vào tin nhắn.', 'Tap an image to enlarge. Use Copy image to paste it directly into a message.')}</p>
               </div>
             </div>
+            {copyImageError && <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[9px] text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300">{copyImageError}</p>}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               {activeRecord.photos.map((photo, index) => (
                 <article key={`${activeRecord.id}:${index}`} className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
@@ -228,9 +227,9 @@ export default function ApartmentCheckIn() {
                   </button>
                   <div className="space-y-2 p-2.5">
                     <p className="line-clamp-2 min-h-8 text-[9px] leading-4 text-slate-600 dark:text-slate-400">{photo.caption}</p>
-                    <button type="button" onClick={() => void sharePhoto(photo, index)} disabled={sharingPhoto === photo.url} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                      {copiedKey === `photo:${index}` ? <Check className="h-3 w-3 text-emerald-600" /> : <Share2 className="h-3 w-3" />}
-                      {sharingPhoto === photo.url ? 'Preparing…' : copiedKey === `photo:${index}` ? 'Copied' : 'Share image'}
+                    <button type="button" onClick={() => void copyPhoto(photo, index)} disabled={copyingPhoto === photo.url} className="flex h-7 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                      {copiedKey === `photo:${index}` ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                      {copyingPhoto === photo.url ? text('Đang sao chép…', 'Copying…') : copiedKey === `photo:${index}` ? text('Đã sao chép ảnh', 'Image copied') : text('Sao chép ảnh', 'Copy image')}
                     </button>
                   </div>
                 </article>
@@ -245,13 +244,9 @@ export default function ApartmentCheckIn() {
               <h3 className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white"><Sparkles className="h-4 w-4 text-amber-500" /> Step-by-step guest message</h3>
               <p className="mt-1 text-[9px] text-slate-400">Choose one language before copying the guide.</p>
             </div>
-            <div className="grid grid-cols-3 rounded-xl bg-slate-100 p-1 dark:bg-slate-950">
-              {([['vi', '🇻🇳 VI'], ['en', '🇬🇧 EN'], ['bilingual', '↔ Both']] as const).map(([value, label]) => (
-                <button key={value} type="button" onClick={() => setLanguage(value)} className={`rounded-lg px-3 py-2 text-[9px] font-extrabold transition ${language === value ? 'bg-white text-indigo-700 shadow-sm dark:bg-slate-800 dark:text-indigo-300' : 'text-slate-400'}`}>
-                  {label}
-                </button>
-              ))}
-            </div>
+            <span className="rounded-xl bg-slate-100 px-3 py-2 text-[10px] font-extrabold text-indigo-700 dark:bg-slate-950 dark:text-indigo-300">
+              {language === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}
+            </span>
           </div>
 
           {displayedSteps.length > 0 ? (
@@ -291,6 +286,25 @@ export default function ApartmentCheckIn() {
   );
 }
 
+async function fetchImageAsPng(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Image download failed.');
+  const source = await response.blob();
+  if (source.type === 'image/png') return source;
+
+  const bitmap = await createImageBitmap(source);
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Image conversion failed.');
+  context.drawImage(bitmap, 0, 0);
+  bitmap.close();
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG conversion failed.')), 'image/png');
+  });
+}
+
 function QuickDetail({ label, value, copied, onCopy }: { label: string; value: string; copied: boolean; onCopy: () => void }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 p-3 dark:border-amber-900/60 dark:bg-amber-950/30">
@@ -305,16 +319,9 @@ function QuickDetail({ label, value, copied, onCopy }: { label: string; value: s
   );
 }
 
-function buildSteps(language: Language, viSteps: string[], enSteps: string[]): string[] {
+function buildSteps(language: 'vi' | 'en', viSteps: string[], enSteps: string[]): string[] {
   if (language === 'vi') return viSteps;
-  if (language === 'en') return enSteps;
-  const length = Math.max(viSteps.length, enSteps.length);
-  return Array.from({ length }, (_, index) => {
-    const parts = [];
-    if (viSteps[index]) parts.push(`🇻🇳 ${viSteps[index]}`);
-    if (enSteps[index]) parts.push(`🇬🇧 ${enSteps[index]}`);
-    return parts.join('\n\n');
-  });
+  return enSteps;
 }
 
 function stripMarkdown(text: string): string {
