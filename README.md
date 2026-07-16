@@ -1,16 +1,28 @@
 # Apartment Control Center PWA
 
-An installable, offline-friendly React/Vite dashboard for apartment inventory, cleaner reminders, Wi-Fi credentials and guest check-in guides.
+An installable React/Vite dashboard for apartment inventory, Wi-Fi credentials, cleaner reminders and guest check-in guides.
 
-## What changed in the GitHub Pages edition
+## Version 3 highlights
 
-- Runs as a fully static site: no Express server or `/api` endpoint is required.
-- Works from both a custom domain and a GitHub Pages `/repository-name/` path.
-- Includes a web app manifest, service worker, install prompt, offline app shell and cached inventory snapshot.
-- Deploys automatically with GitHub Actions.
-- Keeps Wi-Fi passwords, lockbox codes, guest instructions and check-in photos out of the public source bundle.
-- Encrypts the protected apartment vault with PBKDF2 + AES-256-GCM. It is decrypted only after the private access key is entered in the browser.
-- Keeps Google Sheets OAuth access tokens in memory instead of browser storage.
+- Runs on GitHub Pages and the custom domain `airbnb.khaitringuyen.com`.
+- Uses Firebase Authentication as the single sign-in step; the old daily vault key screen is removed.
+- Stores apartment, Wi-Fi and instruction data in Cloud Firestore with real-time updates.
+- Stores check-in photos in Cloud Storage for Firebase.
+- Adds an in-app **Manage Data & Access** screen for apartment CRUD, photo uploads, JSON backups and user roles.
+- Lets the primary admin add or remove users without editing GitHub or redeploying the website.
+- Includes a one-time importer for the existing encrypted apartment package.
+- Keeps the inventory spreadsheet private and requests read-only Google Sheets access.
+
+## Initial access accounts
+
+- Primary admin: `khaitri15@gmail.com`
+- Editors:
+  - `henrynguyenfw@gmail.com`
+  - `trinkse61538@gmail.com`
+  - `airbnbjvilla1225@gmail.com`
+  - `nathantran7@hotmail.com`
+
+The primary admin is also enforced in `firestore.rules` and `storage.rules`, so this account can bootstrap the access collection. Future accounts are managed inside the app.
 
 ## Local development
 
@@ -29,61 +41,71 @@ npm run build
 npm run preview
 ```
 
-## Deploy to GitHub Pages
+## Firebase setup
 
-1. Create a GitHub repository and put the contents of this project at the repository root.
-2. Make sure the default branch is named `main`.
-3. Open **Settings → Pages** and set **Source** to **GitHub Actions**.
-4. Push or upload the files. The workflow in `.github/workflows/deploy-pages.yml` builds and publishes the `dist` directory automatically.
-5. Open the deployment URL shown by the **Deploy PWA to GitHub Pages** action.
+Use the Firebase project referenced by `firebase-applet-config.json`.
 
-Important hidden files and folders:
+1. Enable Google in **Authentication → Sign-in method**.
+2. Add both `trinkse61538.github.io` and `airbnb.khaitringuyen.com` under **Authentication → Settings → Authorised domains**.
+3. Create a Cloud Firestore database in production mode.
+4. Open Firestore **Rules**, paste `firestore.rules`, then publish.
+5. Create the default Cloud Storage bucket.
+6. Open Storage **Rules**, paste `storage.rules`, then publish.
+7. When Firebase asks to allow Storage Rules to read Firestore access documents, approve the connection.
 
-- `.github/workflows/deploy-pages.yml` controls deployment.
-- `.gitignore` prevents private material and local builds from being committed.
-- `public/.nojekyll` is copied into the published site.
-
-When uploading through GitHub's web interface, verify that these dot-prefixed files are present after the upload.
-
-## Enable Google sign-in on the deployed domain
-
-The app reads the inventory spreadsheet through Google OAuth. In the Firebase project referenced by `firebase-applet-config.json`:
-
-1. Open **Firebase Console → Authentication → Settings → Authorized domains**.
-2. Add `YOUR_GITHUB_USERNAME.github.io`.
-3. If a custom domain is used, add that domain as well.
-4. Confirm that the Google provider is enabled in **Authentication → Sign-in method**.
-
-The inventory spreadsheet can remain private. A user must have permission to view it and grant the read-only Google Sheets scope when signing in.
-
-Inventory parsing expects product headings on row 3 of each apartment tab and treats the latest non-empty row as the current status.
-
-## Install on a phone
-
-- Android Chrome: open the deployed URL and use **Install app** or **Add to Home screen**.
-- iPhone/iPad: open the URL in Safari, tap **Share**, then **Add to Home Screen**.
-
-After the protected vault has been opened once while online, the app shell, encrypted apartment vault and latest successfully synced inventory snapshot remain available offline on that device.
-
-## Protected apartment data
-
-Only `public/secure/` is deployed. Its payload and images are encrypted. The unencrypted source package and the private access key must never be committed to GitHub, shared in a public message or placed in the project directory.
-
-To regenerate the encrypted vault after editing the separate private data package:
+The same rules can be deployed with Firebase CLI after signing in:
 
 ```bash
-PWA_ACCESS_PASSPHRASE="your-existing-private-key" \
-PRIVATE_SOURCE_DIR="/absolute/path/to/apartment-private-data" \
-npm run encrypt-data
+firebase deploy --only firestore:rules,storage
 ```
 
-Commit only the newly generated files inside `public/secure/`. Anyone using the old access key will be able to unlock the updated package when the same key is used to regenerate it.
+## Deploy to GitHub Pages
 
-If the access key is lost, the encrypted package cannot be recovered. Keep the private source package and key in a password manager or another secure location.
+1. Put the contents of this project at the repository root.
+2. Keep the default branch named `main`.
+3. Open **Settings → Pages** and set **Source** to **GitHub Actions**.
+4. Push or upload the files. `.github/workflows/deploy-pages.yml` builds and publishes `dist` automatically.
+5. Keep the custom domain set to `airbnb.khaitringuyen.com` and enable **Enforce HTTPS**.
+
+Important dot-prefixed files:
+
+- `.github/workflows/deploy-pages.yml`
+- `.gitignore`
+- `.firebaserc`
+- `public/.nojekyll`
+
+## First run and one-time migration
+
+1. Sign in at `https://airbnb.khaitringuyen.com` as `khaitri15@gmail.com`.
+2. The app creates the initial access documents automatically.
+3. Open **Manage Data & Access**.
+4. If Firestore has no apartments yet, enter the previous private access key in **Import existing data**.
+5. Wait until the import reaches 100%. Existing Wi-Fi, check-in instructions and photos are uploaded to Firebase.
+6. After import, the previous access key is no longer required for normal use.
+
+The encrypted files in `public/secure/` remain only as a one-time migration source. Do not delete them until migration has completed successfully.
+
+## Day-to-day updates
+
+Open **Manage Data & Access** to:
+
+- add, edit or delete an apartment;
+- update Wi-Fi name/password and notes;
+- update lockbox details and bilingual instruction steps;
+- add, caption or remove check-in photos;
+- export a JSON backup;
+- add users and choose Viewer, Editor or Admin roles.
+
+All content changes are saved directly to Firebase and do not require a GitHub deployment.
+
+## Google Sheets inventory
+
+The inventory spreadsheet is read through Google OAuth. A user must have permission to view the sheet and grant the read-only Sheets scope. The OAuth access token stays in memory, so reconnecting Sheets may be required after restarting the browser even though Firebase app sign-in remains active.
 
 ## Security notes
 
-- GitHub Pages is publicly reachable. The encryption layer protects the embedded credentials, but access-key distribution is still your responsibility.
-- Do not place Telegram tokens, webhook URLs or other credentials directly in source files.
-- The dashboard stores notification channel settings locally on the current device. Avoid configuring them on a shared computer.
-- Use a private Google Sheet and grant access only to the people who need inventory synchronization.
+- GitHub Pages is public, but Firestore and Storage data are restricted by Firebase rules to the access list.
+- Do not commit the plaintext private data ZIP or previous access key.
+- A Hotmail address can use the Google button only when that address is registered as a Google Account. Microsoft sign-in can be added later if needed.
+- Keep `khaitri15@gmail.com` under your control because it is the permanent bootstrap admin in the included rules.
+

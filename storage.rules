@@ -1,0 +1,44 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null && request.auth.token.email != null;
+    }
+
+    function isPrimaryAdmin() {
+      return signedIn() && request.auth.token.email.lower() == 'khaitri15@gmail.com';
+    }
+
+    function accessDocument() {
+      return firestore.get(/databases/(default)/documents/access/$(request.auth.token.email.lower()));
+    }
+
+    function hasAccess() {
+      return signedIn()
+        && firestore.exists(/databases/(default)/documents/access/$(request.auth.token.email.lower()))
+        && accessDocument().data.active == true;
+    }
+
+    function isAllowed() {
+      return isPrimaryAdmin() || hasAccess();
+    }
+
+    function canEdit() {
+      return isPrimaryAdmin()
+        || (hasAccess() && accessDocument().data.role in ['admin', 'editor']);
+    }
+
+    match /apartment-media/{allPaths=**} {
+      allow read: if isAllowed();
+      allow create, update: if canEdit()
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if canEdit();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

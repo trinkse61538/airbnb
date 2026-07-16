@@ -1,0 +1,57 @@
+[debug] [2026-07-16T05:18:32.947Z] ----------------------------------------------------------------------
+[debug] [2026-07-16T05:18:32.948Z] Command:       /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /tmp/npm-cache/_npx/a2c365da195827f4/node_modules/.bin/firebase emulators:exec --only firestore true --project demo-apartment-test
+[debug] [2026-07-16T05:18:32.949Z] CLI Version:   13.35.1
+[debug] [2026-07-16T05:18:32.949Z] Platform:      linux
+[debug] [2026-07-16T05:18:32.949Z] Node Version:  v24.14.0
+[debug] [2026-07-16T05:18:32.949Z] Time:          Thu Jul 16 2026 14:18:32 GMT+0900 (Japan Standard Time)
+[debug] [2026-07-16T05:18:32.949Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-16T05:18:32.951Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-16T05:18:33.105Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] Failed to authenticate, have you run firebase login?
+[warn] ⚠  emulators: You are not currently authenticated so some features may not work correctly. Please run firebase login to authenticate the CLI. 
+[debug] [2026-07-16T05:18:33.158Z] openjdk version "17.0.19" 2026-04-21
+OpenJDK Runtime Environment (build 17.0.19+10-1-24.04.2-Ubuntu)
+
+[debug] [2026-07-16T05:18:33.159Z] OpenJDK 64-Bit Server VM (build 17.0.19+10-1-24.04.2-Ubuntu, mixed mode, sharing)
+
+[debug] [2026-07-16T05:18:33.162Z] Parsed Java major version: 17
+[info] i  emulators: Starting emulators: firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: firestore"}}
+[info] i  emulators: Detected demo project ID "demo-apartment-test", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail. {"metadata":{"emulator":{"name":"hub"},"message":"Detected demo project ID \"demo-apartment-test\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail."}}
+[debug] [2026-07-16T05:18:33.166Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-07-16T05:18:33.166Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-07-16T05:18:33.166Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-07-16T05:18:33.166Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-07-16T05:18:33.168Z] [hub] writing locator at /tmp/hub-demo-apartment-test.json
+[info] i  firestore: downloading cloud-firestore-emulator-v1.19.8.jar... {"metadata":{"emulator":{"name":"firestore"},"message":"downloading cloud-firestore-emulator-v1.19.8.jar..."}}
+[debug] [2026-07-16T05:18:33.177Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] i  emulators: Shutting down emulators. {"metadata":{"emulator":{"name":"hub"},"message":"Shutting down emulators."}}
+[info] i  firestore: Stopping Firestore Emulator {"metadata":{"emulator":{"name":"firestore"},"message":"Stopping Firestore Emulator"}}
+[info] i  hub: Stopping emulator hub {"metadata":{"emulator":{"name":"hub"},"message":"Stopping emulator hub"}}
+[debug] [2026-07-16T05:18:33.179Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[debug] [2026-07-16T05:18:33.180Z] Error: ENOENT: no such file or directory, mkdir '/root/.cache/firebase/emulators'
+    at Object.mkdirSync (node:fs:1349:26)
+    at module.exports.makeDirSync (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/fs-extra/lib/mkdirs/make-dir.js:23:13)
+    at downloadEmulator (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/download.js:21:8)
+    at Object.start (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/downloadableEmulators.js:464:51)
+    at FirestoreEmulator.start (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/firestoreEmulator.js:42:38)
+    at EmulatorRegistry.start (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/registry.js:19:24)
+    at startEmulator (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/controller.js:293:44)
+    at Object.startAll (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/controller.js:468:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async emulatorExec (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/emulator/commandUtils.js:298:35)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2026-07-16T05:18:33.437Z] Error: ENOENT: no such file or directory, mkdir '/root/.config/configstore'
+    at Object.mkdirSync (node:fs:1349:26)
+    at module.exports.sync (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/make-dir/index.js:114:6)
+    at set all (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/configstore/index.js:59:12)
+    at Configstore.delete (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/configstore/index.js:101:12)
+    at process.<anonymous> (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/bin/firebase.js:103:41)
+    at process.emit (node:events:520:35)
+    at process.emit (node:domain:489:12)
+    at process.exit (node:internal/process/per_thread:236:15)
+    at Timeout._onTimeout (/tmp/npm-cache/_npx/a2c365da195827f4/node_modules/firebase-tools/lib/errorOut.js:20:17)
+    at listOnTimeout (node:internal/timers:605:17)
+[error] 
+[error] Error: An unexpected error has occurred.
