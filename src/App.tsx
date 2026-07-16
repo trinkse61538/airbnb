@@ -17,9 +17,10 @@ import CleanerReminder from './components/CleanerReminder';
 import ApartmentWifi from './components/ApartmentWifi';
 import ApartmentCheckIn from './components/ApartmentCheckIn';
 import SetupGuide from './components/SetupGuide';
-import SecureAccessGate from './components/SecureAccessGate';
+import DataManagement from './components/DataManagement';
+import AccessBoundary from './components/AccessBoundary';
 import { InstallAppButton, NetworkStatus } from './components/PWAControls';
-import { useSecureData } from './secure/SecureDataProvider';
+import { useApartmentData } from './data/ApartmentDataProvider';
 import { publicUrl } from './utils/publicUrl';
 import { 
   RefreshCw, 
@@ -32,9 +33,9 @@ import {
   Grid,
   BellRing,
   Building2,
-  Lock,
   Smartphone,
   UserCheck,
+  UserCog,
   Wifi,
   Key,
   ArrowDown,
@@ -52,6 +53,8 @@ interface CachedSnapshot {
   syncedAt: string;
 }
 
+type ActiveTab = 'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'manage' | 'setup';
+
 function readCachedSnapshot(): CachedSnapshot | null {
   try {
     const cached = localStorage.getItem(SNAPSHOT_KEY);
@@ -63,7 +66,7 @@ function readCachedSnapshot(): CachedSnapshot | null {
 
 export default function App() {
   const cachedSnapshot = readCachedSnapshot();
-  const { status: vaultStatus, lock: lockVault } = useSecureData();
+  const { canEdit, role } = useApartmentData();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -100,10 +103,10 @@ export default function App() {
     return localStorage.getItem('inventory_shortage_terms') || 'low, empty, 0, shortage, out';
   });
 
-  const [activeTab, setActiveTab] = useState<'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'setup'>(() => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const requestedTab = new URLSearchParams(window.location.search).get('tab');
-    return ['apartments', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'setup'].includes(requestedTab || '')
-      ? requestedTab as 'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'setup'
+    return ['apartments', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'manage', 'setup'].includes(requestedTab || '')
+      ? requestedTab as ActiveTab
       : 'apartments';
   });
   const [showSettings, setShowSettings] = useState(false);
@@ -322,7 +325,7 @@ export default function App() {
               }`}>
                 Apartment Inventory <span className={`hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded-md font-semibold border font-sans ${
                   darkMode ? 'bg-indigo-950/50 text-indigo-300 border-indigo-900/50' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
-                }`}>v2.0 PWA</span>
+                }`}>v3.0 PWA</span>
               </h1>
               <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 truncate hidden sm:block ${
                 darkMode ? 'text-slate-400' : 'text-slate-500'
@@ -333,16 +336,6 @@ export default function App() {
           {/* Right side Header buttons */}
           <div className="flex items-center gap-2 sm:gap-3 ml-auto shrink-0">
             <InstallAppButton compact />
-            {vaultStatus === 'unlocked' && (
-              <button
-                type="button"
-                onClick={lockVault}
-                title="Lock protected apartment data"
-                className="flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 p-2 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400"
-              >
-                <Lock className="h-4 w-4" />
-              </button>
-            )}
             {/* Dark Mode toggle button */}
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -368,7 +361,7 @@ export default function App() {
                   }`}>{user.displayName || user.email}</span>
                   <span className="text-[9px] text-emerald-400 font-mono flex items-center justify-end gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Sync Enabled
+                    {role ? `${role.charAt(0).toUpperCase()}${role.slice(1)}` : 'Authorizing'}
                   </span>
                 </div>
                 
@@ -424,6 +417,7 @@ export default function App() {
             <p className="text-slate-500 text-xs font-semibold">Verifying secure Google session...</p>
           </div>
         ) : (
+          <AccessBoundary onLogin={() => void handleLogin()} onLogout={() => void handleLogout()} isLoggingIn={isLoggingIn}>
           <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
             
             {/* 4. Three column key status boards (Render only for sheets-dependent tabs if reports are loaded) */}
@@ -624,6 +618,25 @@ export default function App() {
                     <span className="hidden md:inline">Install & Phone Automation</span>
                   </span>
                 </button>
+                {canEdit && (
+                  <button
+                    onClick={() => setActiveTab('manage')}
+                    id="tab-manage"
+                    className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-150 cursor-pointer border select-none focus:outline-none active:scale-95 shadow-xs ${
+                      activeTab === 'manage'
+                        ? 'bg-gradient-to-r from-violet-600 to-violet-700 text-white border-violet-500 shadow-md shadow-violet-500/20 scale-[1.03]'
+                        : darkMode
+                          ? 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                          : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400 hover:text-slate-900 shadow-sm'
+                    }`}
+                  >
+                    <UserCog className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'manage' ? 'text-white' : 'text-violet-500'}`} />
+                    <span className="truncate">
+                      <span className="inline md:hidden">Manage</span>
+                      <span className="hidden md:inline">Manage Data & Access</span>
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -827,12 +840,12 @@ export default function App() {
                   </div>
                 )
               ) : (
-                (activeTab === 'wifi' || activeTab === 'checkin') && vaultStatus !== 'unlocked' ? (
-                  <SecureAccessGate />
-                ) : activeTab === 'wifi' ? (
+                activeTab === 'wifi' ? (
                   <ApartmentWifi />
                 ) : activeTab === 'checkin' ? (
                   <ApartmentCheckIn />
+                ) : activeTab === 'manage' ? (
+                  <DataManagement />
                 ) : (
                   <SetupGuide currentSpreadsheetId={currentSheetId || ''} />
                 )
@@ -986,6 +999,7 @@ export default function App() {
               </div>
             )}
           </div>
+          </AccessBoundary>
         )}
       </main>
 
@@ -999,7 +1013,7 @@ export default function App() {
             </span>
             <span>•</span>
             <span className="hover:text-indigo-600 font-semibold flex items-center gap-0.5">
-              Encrypted vault
+              Firebase access control
             </span>
           </div>
         </div>
