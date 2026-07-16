@@ -13,13 +13,13 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-import { useSecureData } from '../secure/SecureDataProvider';
+import { useApartmentData } from '../data/ApartmentDataProvider';
 import { CheckInPhoto } from '../secure/types';
 
 type Language = 'vi' | 'en' | 'bilingual';
 
 export default function ApartmentCheckIn() {
-  const { data } = useSecureData();
+  const { data } = useApartmentData();
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState('');
   const [language, setLanguage] = useState<Language>('bilingual');

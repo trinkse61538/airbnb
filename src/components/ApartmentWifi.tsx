@@ -9,12 +9,12 @@ import {
   ShieldCheck,
   Wifi,
 } from 'lucide-react';
-import { useSecureData } from '../secure/SecureDataProvider';
+import { useApartmentData } from '../data/ApartmentDataProvider';
 
 type CopyType = 'all' | 'ssid' | 'password';
 
 export default function ApartmentWifi() {
-  const { data } = useSecureData();
+  const { data } = useApartmentData();
   const [query, setQuery] = useState('');
   const [revealPasswords, setRevealPasswords] = useState(false);
   const [copiedKey, setCopiedKey] = useState('');
@@ -56,7 +56,7 @@ export default function ApartmentWifi() {
               </span>
               <div>
                 <h2 className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">Apartment Wi-Fi</h2>
-                <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">{wifiRecords.length} protected network profiles</p>
+                <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">{wifiRecords.length} network profiles</p>
               </div>
             </div>
           </div>
