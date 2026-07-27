@@ -620,7 +620,7 @@ function ParkingManager({ records, loading, error }: { records: ParkingRecord[];
   );
 }
 
-function ParkingEditor({ record, onSaved }: { record: ParkingRecord; onSaved: () => void }) {
+function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecord; onSaved: () => void }) {
   const [working, setWorking] = useState<ParkingGuideData>(() => cloneParking(record.parking));
   const [viSteps, setViSteps] = useState(() => stepsToText(record.parking.instructionsVi));
   const [enSteps, setEnSteps] = useState(() => stepsToText(record.parking.instructionsEn));
@@ -842,6 +842,7 @@ function TextArea({ label, helper, value, onChange, rows = 8 }: { label: string;
 }
 
 function ParkingPhotoEditor({ src, captionVi, captionEn, onCaptionVi, onCaptionEn, onRemove, isNew = false }: {
+  key?: string;
   src: string;
   captionVi: string;
   captionEn: string;
