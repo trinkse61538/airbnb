@@ -483,6 +483,89 @@ Thank you.`,
   }
 
 
+
+  if (normalized.endsWith('luxury 1bdr | sparkling harbourside')) {
+    return {
+      enabled: true,
+      statusVi: 'Không có parking miễn phí · có bãi xe trả phí gần đó',
+      statusEn: 'No free parking included · affordable paid parking nearby',
+      locationVi: 'St Andrews House Town Hall, Cinema Centre hoặc các bãi xe gần căn hộ',
+      locationEn: 'St Andrews House Town Hall, Cinema Centre or other nearby car parks',
+      accessVi: 'Đặt trước bằng Wilson Parking app hoặc drive-in',
+      accessEn: 'Pre-book with the Wilson Parking app or drive in',
+      spot: '',
+      mapUrl: 'https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/st-andrews-house-town-hall-car-park/',
+      noteVi: 'Căn hộ không bao gồm chỗ đậu xe miễn phí. St Andrews House Town Hall có parking giá hợp lý gần đó. Cinema Centre Car Park thường có thể drive-in với giá khá rẻ và không cần prepay. Ngoài ra còn có street parking và nhiều bãi xe lân cận; nên đặt trước qua ứng dụng Wilson Parking.',
+      noteEn: 'Free parking is not included with the accommodation. St Andrews House Town Hall offers affordable parking nearby. Cinema Centre Car Park is generally a cheap drive-in option and does not need to be prepaid. There is also street and other nearby parking; pre-booking through the Wilson Parking app is recommended.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Căn hộ **không bao gồm chỗ đậu xe miễn phí** trong tòa nhà.',
+        'Bạn có thể đặt xe tại **St Andrews House Town Hall Car Park**, một lựa chọn giá hợp lý gần căn hộ.',
+        'Link đặt St Andrews House Town Hall: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/st-andrews-house-town-hall-car-park/',
+        'Bạn cũng có thể **drive-in tại Cinema Centre Car Park**. Đây thường là lựa chọn khá rẻ và **không cần thanh toán trước**.',
+        'Khu vực xung quanh có thêm street parking và nhiều bãi xe khác.',
+        'Để có giá tốt và chắc chắn còn chỗ, nên **pre-book qua ứng dụng Wilson Parking**.',
+      ],
+      instructionsEn: [
+        'There is **no free parking included** with the accommodation.',
+        'You may park at **St Andrews House Town Hall Car Park**, which is an affordable nearby option.',
+        'St Andrews House Town Hall booking link: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/st-andrews-house-town-hall-car-park/',
+        'You may also **drive in to Cinema Centre Car Park**. It is generally a cheap option and **does not need to be prepaid**.',
+        'There is also street parking and a range of other nearby car parks.',
+        'For a better rate and to secure a space, we recommend **pre-booking through the Wilson Parking app**.',
+      ],
+      messageVi: `Xin chào,\n\nĐối với căn **${apartment}**, hiện căn hộ **không bao gồm chỗ đậu xe miễn phí** trong tòa nhà.\n\nBạn có thể đặt trước tại **St Andrews House Town Hall Car Park**, một lựa chọn giá hợp lý gần căn hộ:\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/st-andrews-house-town-hall-car-park/\n\nBạn cũng có thể **drive-in tại Cinema Centre Car Park**. Đây thường là lựa chọn khá rẻ và không cần thanh toán trước. Khu vực xung quanh cũng có street parking và nhiều bãi xe gần đó.\n\nĐể có giá tốt và chắc chắn còn chỗ, bên mình khuyến nghị đặt trước qua **ứng dụng Wilson Parking**.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nFor **${apartment}**, please note that **free parking is not included** with the accommodation.\n\nYou may pre-book affordable parking at **St Andrews House Town Hall Car Park**:\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/st-andrews-house-town-hall-car-park/\n\nAlternatively, you may **drive in to Cinema Centre Car Park**, which is generally a cheap option and does not need to be prepaid. There is also street and other nearby parking available.\n\nFor a better rate and to secure a space, we recommend pre-booking through the **Wilson Parking app**.\n\nThanks.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('luxury 3br skyline | water views')) {
+    return {
+      enabled: true,
+      statusVi: 'Không có parking trong tòa nhà · cần đặt bãi xe gần đó',
+      statusEn: 'No parking in the building · nearby paid parking required',
+      locationVi: 'Gần 38 York Street: 383 Kent Street, George Place hoặc 71 York Street',
+      locationEn: 'Near 38 York Street: 383 Kent Street, George Place or 71 York Street',
+      accessVi: 'Đặt trước online/app để có giá tốt hơn hoặc drive-in',
+      accessEn: 'Pre-book online/in the app for a better rate or drive in',
+      spot: '',
+      mapUrl: 'https://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/',
+      noteVi: 'Không có bãi xe trong tòa nhà tại 38 York Street. Khuyến nghị dùng phương tiện công cộng: khoảng 5 phút đi bộ đến Wynyard Station và 4 phút đến trạm light rail. Nếu lái xe, nên đặt trước vì drive-in thường đắt hơn. George Place có giờ mở/đóng; có thể để xe bên trong khi đóng nhưng không thể ra vào trong thời gian đó.',
+      noteEn: 'There is no parking in the building at 38 York Street. Public transport is recommended: approximately 5 minutes to Wynyard Station and 4 minutes to the light rail. If driving, pre-booking is recommended because drive-in rates are usually higher. George Place has opening and closing hours; the car may remain inside while closed, but it cannot be accessed during those hours.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Căn hộ tại **38 York Street, Sydney NSW 2000 không có parking trong tòa nhà**.',
+        'Bên mình khuyến nghị sử dụng phương tiện công cộng vì đây thường là cách nhanh và thuận tiện nhất: khoảng **5 phút đi bộ đến Wynyard Station** và **4 phút đến trạm light rail**.',
+        'Nếu lái xe, lựa chọn được khuyến nghị đầu tiên là **383 Kent Street Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/',
+        'Lựa chọn thứ hai là **George Place Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#',
+        'George Place **không hoạt động 24 giờ**. Bạn có thể để xe bên trong khi bãi đóng cửa, nhưng sẽ **không thể tiếp cận xe trong giờ đóng cửa**.',
+        'Một lựa chọn khác là **71 York Street Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#',
+        'Các bãi xe này có thể đặt qua app/online hoặc drive-in, nhưng **đặt trước thường rẻ hơn**, còn drive-in thường có giá cao hơn.',
+      ],
+      instructionsEn: [
+        'There is **no parking in the building** at **38 York Street, Sydney NSW 2000**.',
+        'We recommend public transport because it is usually the quickest and most convenient option: approximately a **5-minute walk to Wynyard Station** and **4 minutes to the light rail stop**.',
+        'Our first recommended parking option is **383 Kent Street Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/',
+        'The second option is **George Place Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#',
+        'George Place is **not accessible 24 hours**. You may leave the car inside during closed hours, but you **cannot access it while the car park is closed**.',
+        'Another option is **71 York Street Car Park**: https://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#',
+        'These car parks can be booked through the app/online or used as drive-in parking, but **pre-booking is usually cheaper** and drive-in rates are generally higher.',
+      ],
+      messageVi: `Xin chào,\n\nĐối với căn **${apartment}** tại **38 York Street, Sydney NSW 2000**, xin lưu ý rằng **tòa nhà không có parking**.\n\nBên mình khuyến nghị sử dụng phương tiện công cộng vì đây là lựa chọn nhanh và thuận tiện nhất: căn hộ cách **Wynyard Station khoảng 5 phút đi bộ** và cách trạm **light rail khoảng 4 phút**.\n\nNếu bạn cần lái xe, có thể đặt trước các bãi xe sau:\n\n1. 383 Kent Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/\n\n2. George Place Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#\nLưu ý: bãi này không mở 24 giờ. Bạn có thể để xe bên trong trong giờ đóng cửa nhưng sẽ không thể tiếp cận xe.\n\n3. 71 York Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#\n\nBạn có thể đặt qua app/online hoặc drive-in, nhưng **đặt trước thường rẻ hơn**.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nFor **${apartment}** at **38 York Street, Sydney NSW 2000**, please note that **there is no parking in the building**.\n\nWe recommend public transport because it is the quickest and most convenient option. The apartment is approximately a **5-minute walk from Wynyard Station** and **4 minutes from the light rail stop**.\n\nIf you need to drive, you may pre-book one of the following nearby options:\n\n1. 383 Kent Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/\n\n2. George Place Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#\nPlease note that this car park is not accessible 24 hours. You may leave the car inside during closed hours, but you cannot access it while the car park is closed.\n\n3. 71 York Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#\n\nYou can book through the app/online or drive in, but **pre-booking is usually cheaper**.\n\nHope this helps.`,
+      photos: [],
+    };
+  }
+
   if (
     (normalized.includes('blue horizon') && normalized.includes('$1 million'))
     || normalized.endsWith('blue horizon • $1 million view')
@@ -548,11 +631,11 @@ function parseParking(apartment: string, rawValue: unknown): ParkingGuideData {
     mapUrl: stringValue('mapUrl', fallback.mapUrl),
     noteVi: stringValue('noteVi', fallback.noteVi),
     noteEn: stringValue('noteEn', fallback.noteEn),
-    internalNoteVi: stringValue('internalNoteVi', fallback.internalNoteVi),
-    internalNoteEn: stringValue('internalNoteEn', fallback.internalNoteEn),
-    internalEmailTo: stringValue('internalEmailTo', fallback.internalEmailTo),
-    internalEmailSubject: stringValue('internalEmailSubject', fallback.internalEmailSubject),
-    internalEmailBody: stringValue('internalEmailBody', fallback.internalEmailBody),
+    internalNoteVi: stringValue('internalNoteVi', fallback.internalNoteVi) || fallback.internalNoteVi,
+    internalNoteEn: stringValue('internalNoteEn', fallback.internalNoteEn) || fallback.internalNoteEn,
+    internalEmailTo: stringValue('internalEmailTo', fallback.internalEmailTo) || fallback.internalEmailTo,
+    internalEmailSubject: stringValue('internalEmailSubject', fallback.internalEmailSubject) || fallback.internalEmailSubject,
+    internalEmailBody: stringValue('internalEmailBody', fallback.internalEmailBody) || fallback.internalEmailBody,
     instructionsVi: stepsValue('instructionsVi', fallback.instructionsVi),
     instructionsEn: stepsValue('instructionsEn', fallback.instructionsEn),
     messageVi: stringValue('messageVi', fallback.messageVi),
@@ -883,6 +966,60 @@ function ParkingPanel({ records, loading, error, lang }: { records: ParkingRecor
           {(guide.noteVi || guide.noteEn) && <div className="mx-5 mb-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[10px] leading-5 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200"><b>{t('Lưu ý:', 'Important:')}</b> {t(guide.noteVi, guide.noteEn)}</div>}
         </section>
 
+        {(guide.internalEmailTo || guide.internalEmailSubject || guide.internalEmailBody) && (
+          <section className={`${card} overflow-hidden border-violet-200 dark:border-violet-900`}>
+            <div className="border-b border-violet-100 bg-gradient-to-r from-violet-50 to-white p-5 dark:border-violet-900/50 dark:from-violet-950/30 dark:to-slate-900">
+              <p className="text-[9px] font-extrabold uppercase tracking-[.18em] text-violet-600 dark:text-violet-400">Internal parking operations</p>
+              <h3 className="mt-1 text-sm font-extrabold text-slate-900 dark:text-white">{t('Email đăng ký parking với Ban quản lý', 'Building management parking email')}</h3>
+              <p className="mt-1 text-[9px] leading-4 text-slate-500 dark:text-slate-400">{t('Chỉ dành cho đội vận hành. Không gửi nội dung này cho khách.', 'Internal use only. Do not send this section to the guest.')}</p>
+            </div>
+
+            {(guide.internalNoteVi || guide.internalNoteEn) && (
+              <div className="mx-5 mt-5 rounded-xl border border-violet-200 bg-violet-50/70 p-3 text-[10px] leading-5 text-violet-900 dark:border-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+                <b>{t('Ghi chú nội bộ:', 'Internal note:')}</b> {t(guide.internalNoteVi, guide.internalNoteEn)}
+              </div>
+            )}
+
+            <div className="grid gap-3 p-5 md:grid-cols-2">
+              <QuickCopyField
+                label="Internal email recipient"
+                value={guide.internalEmailTo}
+                copied={copied === 'internal:recipient'}
+                onCopy={() => void copyText('internal:recipient', guide.internalEmailTo)}
+              />
+              <QuickCopyField
+                label="Internal email subject"
+                value={guide.internalEmailSubject}
+                copied={copied === 'internal:subject'}
+                onCopy={() => void copyText('internal:subject', guide.internalEmailSubject)}
+              />
+              <div className="md:col-span-2">
+                <QuickCopyField
+                  label="Internal email template"
+                  value={guide.internalEmailBody}
+                  copied={copied === 'internal:template'}
+                  onCopy={() => void copyText('internal:template', guide.internalEmailBody)}
+                  multiline
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void copyText('internal:full', [
+                    guide.internalEmailTo ? `To: ${guide.internalEmailTo}` : '',
+                    guide.internalEmailSubject ? `Subject: ${guide.internalEmailSubject}` : '',
+                    guide.internalEmailBody,
+                  ].filter(Boolean).join('\n\n'))}
+                  className={`${btn} h-10 bg-violet-600 px-4 text-[10px] text-white hover:bg-violet-700`}
+                >
+                  {copied === 'internal:full' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied === 'internal:full' ? t('Đã sao chép email', 'Full email copied') : t('Sao chép toàn bộ email', 'Copy full internal email')}
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
+
         {guide.photos.length > 0 && (
           <section className={`${card} p-5`}>
             <h3 className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white"><ImageIcon className="h-4 w-4 text-orange-500" />{t('Hình nhận diện vị trí đậu xe', 'Parking photos')}</h3>
@@ -1016,7 +1153,6 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [internalEmailCopied, setInternalEmailCopied] = useState(false);
   const pendingRef = useRef<PendingPhoto[]>([]);
 
   useEffect(() => { pendingRef.current = pendingPhotos; }, [pendingPhotos]);
@@ -1111,17 +1247,6 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
     }
   };
 
-  const copyInternalEmail = async () => {
-    const content = [
-      working.internalEmailTo ? `To: ${working.internalEmailTo}` : '',
-      working.internalEmailSubject ? `Subject: ${working.internalEmailSubject}` : '',
-      working.internalEmailBody,
-    ].filter(Boolean).join('\n\n');
-    if (!content) return;
-    await navigator.clipboard.writeText(content);
-    setInternalEmailCopied(true);
-    window.setTimeout(() => setInternalEmailCopied(false), 1800);
-  };
 
   return (
     <div className="min-w-0 space-y-5">
@@ -1154,21 +1279,12 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
         <TextArea label="🇬🇧 Important note" value={working.noteEn} onChange={value => update('noteEn', value)} rows={5} />
       </FormSection>
 
-      <FormSection title="Internal operations · not shown to guests">
+      <FormSection title="Internal note · not shown to guests">
         <div className="col-span-full rounded-xl border border-violet-200 bg-violet-50/70 p-3 text-[10px] leading-5 text-violet-800 dark:border-violet-900 dark:bg-violet-950/20 dark:text-violet-300">
-          Nội dung trong khu vực này chỉ dành cho đội vận hành. Parking Guide ở tab dành cho khách sẽ không hiển thị ghi chú hoặc email nội bộ.
+          Ghi chú vận hành vẫn có thể chỉnh sửa tại đây. Các phần copy nhanh Internal email recipient, subject và template đã được chuyển sang tab Parking Guide của đúng căn hộ.
         </div>
         <TextArea label="🇻🇳 Ghi chú nội bộ" value={working.internalNoteVi} onChange={value => update('internalNoteVi', value)} rows={5} />
         <TextArea label="🇬🇧 Internal note" value={working.internalNoteEn} onChange={value => update('internalNoteEn', value)} rows={5} />
-        <Field label="Internal email recipient" value={working.internalEmailTo} onChange={value => update('internalEmailTo', value)} />
-        <Field label="Internal email subject" value={working.internalEmailSubject} onChange={value => update('internalEmailSubject', value)} />
-        <div className="col-span-full">
-          <TextArea label="Internal email template" helper="Use placeholders such as [CAR PLATE], [CHECK-IN DATE] and [CHECK-OUT DATE] before sending." value={working.internalEmailBody} onChange={value => update('internalEmailBody', value)} rows={13} />
-          <button type="button" onClick={() => void copyInternalEmail()} disabled={!working.internalEmailTo && !working.internalEmailSubject && !working.internalEmailBody} className={`mt-2 inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-[9px] font-extrabold transition disabled:opacity-40 ${internalEmailCopied ? 'bg-emerald-600 text-white' : 'bg-violet-600 text-white hover:bg-violet-700'}`}>
-            {internalEmailCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {internalEmailCopied ? 'Internal email copied' : 'Copy internal email'}
-          </button>
-        </div>
       </FormSection>
 
       <FormSection title="Step-by-step parking instructions">
@@ -1285,6 +1401,29 @@ function ParkingPhotoEditor({ src, captionVi, captionEn, onCaptionVi, onCaptionE
         <input value={captionEn} onChange={event => onCaptionEn(event.target.value)} placeholder="🇬🇧 Photo caption" className="h-9 w-full rounded-lg border border-slate-200 bg-white px-2 text-[9px] outline-none focus:border-orange-500 dark:border-slate-700 dark:bg-slate-900" />
       </div>
     </article>
+  );
+}
+
+function QuickCopyField({ label, value, copied, onCopy, multiline = false }: {
+  label: string;
+  value: string;
+  copied: boolean;
+  onCopy: () => void;
+  multiline?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-violet-100 bg-violet-50/40 p-3 dark:border-violet-900/60 dark:bg-violet-950/10">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[9px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">{label}</p>
+        <button type="button" onClick={onCopy} disabled={!value} className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-violet-600 px-2.5 text-[8px] font-extrabold text-white transition hover:bg-violet-700 disabled:opacity-40">
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      {multiline
+        ? <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-lg border border-violet-100 bg-white p-3 font-sans text-[10px] leading-5 text-slate-700 dark:border-violet-900/50 dark:bg-slate-950 dark:text-slate-300">{value || '—'}</pre>
+        : <p className="mt-2 break-words text-[11px] font-semibold leading-5 text-slate-800 dark:text-slate-200">{value || '—'}</p>}
+    </div>
   );
 }
 
