@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apartment-control-pwa-v3-0-9';
+const CACHE_NAME = 'apartment-control-pwa-v3-0-11';
 const CACHE_PREFIX = 'apartment-control-pwa-';
 
 function scopedUrl(path = '') {
@@ -15,6 +15,9 @@ self.addEventListener('install', event => {
         scopedUrl('logo.jpg'),
         scopedUrl('icons/icon-192.png'),
         scopedUrl('icons/icon-512.png'),
+        scopedUrl('parking/blue-enclave-key-fob.jpg'),
+        scopedUrl('parking/blue-enclave-building.jpg'),
+        scopedUrl('parking/blue-enclave-spot-64.jpg'),
       ]))
       .then(() => self.skipWaiting()),
   );
