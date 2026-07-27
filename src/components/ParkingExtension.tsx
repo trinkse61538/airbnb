@@ -88,11 +88,19 @@ const BUILTIN_BLISS_PHOTO = 'builtin:bliss-garage-77';
 const BUILTIN_BLUE_ENCLAVE_KEY_FOB = 'builtin:blue-enclave-key-fob';
 const BUILTIN_BLUE_ENCLAVE_BUILDING = 'builtin:blue-enclave-building';
 const BUILTIN_BLUE_ENCLAVE_SPOT_64 = 'builtin:blue-enclave-spot-64';
+const BUILTIN_CASINO_ENCLAVE_BUILDING = 'builtin:casino-enclave-building';
+const BUILTIN_CASINO_ENCLAVE_KEY_FOB = 'builtin:casino-enclave-key-fob';
+const BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS = 'builtin:casino-enclave-level-2-lifts';
+const BUILTIN_CASINO_ENCLAVE_SPOT_57 = 'builtin:casino-enclave-spot-57';
 const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_BLISS_PHOTO]: BLISS_GARAGE_77_IMAGE,
   [BUILTIN_BLUE_ENCLAVE_KEY_FOB]: publicUrl('parking/blue-enclave-key-fob.jpg'),
   [BUILTIN_BLUE_ENCLAVE_BUILDING]: publicUrl('parking/blue-enclave-building.jpg'),
   [BUILTIN_BLUE_ENCLAVE_SPOT_64]: publicUrl('parking/blue-enclave-spot-64.jpg'),
+  [BUILTIN_CASINO_ENCLAVE_BUILDING]: publicUrl('parking/casino-enclave-building.jpg'),
+  [BUILTIN_CASINO_ENCLAVE_KEY_FOB]: publicUrl('parking/casino-enclave-key-fob.jpg'),
+  [BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS]: publicUrl('parking/casino-enclave-level-2-lifts.jpg'),
+  [BUILTIN_CASINO_ENCLAVE_SPOT_57]: publicUrl('parking/casino-enclave-spot-57.jpg'),
 };
 const builtinPhotoUrl = (storagePath: string) => BUILTIN_PHOTO_URLS[storagePath] || '';
 const isBuiltinPhoto = (storagePath: string) => Boolean(BUILTIN_PHOTO_URLS[storagePath]);
@@ -274,8 +282,210 @@ function defaultParkingFor(apartment: string): ParkingGuideData | null {
     };
   }
 
+
+  if (normalized.endsWith('casino enclave | prime 3br + fish market')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe miễn phí · vui lòng báo trước',
+      statusEn: 'Free parking · please let us know in advance',
+      locationVi: '152 Bulwara Road, Pyrmont NSW 2009 · cách căn hộ khoảng 4 phút đi bộ',
+      locationEn: '152 Bulwara Road, Pyrmont NSW 2009 · approximately a 4-minute walk',
+      accessVi: 'Lấy key fob trong keyset rồi quét tại cổng',
+      accessEn: 'Collect the key fob from the keyset, then tap it at the gate',
+      spot: 'Parking spot #57',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=152+Bulwara+Road+Pyrmont+NSW+2009',
+      noteVi: 'Vui lòng báo trước nếu cần giữ chỗ. Chỉ đậu đúng ô #57, nằm xuống 1 tầng và ngay cạnh thang máy LEVEL 2. Không nhắc đến Airbnb vì đây là bãi xe dành cho cư dân. Phần lớn kích thước và chiều cao xe thông thường đều phù hợp.',
+      noteEn: 'Please let us know if we should reserve this spot for you. Park only in spot #57, which is one level down and right next to the LEVEL 2 lifts. Do not mention Airbnb because the car park is intended for residents. Most standard car sizes and heights should fit.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Nếu cần đậu xe miễn phí, vui lòng báo trước để bên mình giữ chỗ cho bạn.',
+        'Bãi xe nằm tại **152 Bulwara Road, Pyrmont NSW 2009**, cách căn hộ khoảng **4 phút đi bộ**.',
+        'Key fob nằm cùng **key set** mà bên mình sẽ gửi hướng dẫn nhận sau đó. Hãy lấy **key fob** từ keyset trước khi vào bãi xe.',
+        'Đi đúng lối xuống bãi xe như trong ảnh, sau đó **quét key fob tại đầu đọc ở cổng** để mở cổng.',
+        'Vào trong bãi xe và đậu đúng tại **spot #57** — vị trí này **xuống 1 tầng** và nằm **ngay cạnh thang máy LEVEL 2**.',
+        'Vui lòng đậu xe **đúng vị trí và gọn trong ô**. Không đậu sang vị trí khác.',
+        'Đây là bãi xe dành cho cư dân nên vui lòng **không nhắc đến Airbnb** trong khu vực đậu xe.',
+        'Sau khi đậu xe xong, đi đến thang máy, **quét key fob** rồi bấm **Level 4** (tương đương tầng trệt / ground level). Sau đó bạn có thể ra vào tự do.',
+      ],
+      instructionsEn: [
+        'If you require parking, please let us know in advance so we can reserve the complimentary space for you.',
+        'Parking is located at **152 Bulwara Road, Pyrmont NSW 2009**, approximately a **4-minute walk** from the apartment.',
+        'The **key fob** is located with your **key set**, which we will send later. Please collect the fob from the keyset before entering the car park.',
+        'Go to the correct car park entrance as shown in the photo, then **tap the key fob at the gate reader** to open the gate.',
+        'Once inside, park only in **spot #57** — this spot is **one level down** and **right next to the LEVEL 2 lifts**.',
+        'Please park **correctly and neatly within the bay**. Do not use any other spot.',
+        'Please do **not mention Airbnb** in the parking area, as this car park is intended for residents and building staff can be strict.',
+        'After parking, go to the lifts, **tap the fob** and press **Level 4** (which is essentially ground level). You can exit freely after that.',
+      ],
+      messageVi: `Xin chào,
+
+Hy vọng bạn đang háo hức cho kỳ nghỉ sắp tới. Nếu bạn cần đậu xe, bên mình hiện có thể cung cấp **1 chỗ đậu xe miễn phí**. Vui lòng báo lại để bên mình giữ chỗ cho bạn.
+
+Bãi xe nằm tại **152 Bulwara Road, Pyrmont NSW 2009**, cách căn hộ khoảng **4 phút đi bộ**. **Key fob** nằm cùng **key set** mà bên mình sẽ gửi hướng dẫn nhận sau. Bạn cần lấy key fob từ keyset trước khi vào bãi xe.
+
+Khi đến nơi, hãy quét key fob tại cổng để vào bãi xe, sau đó đậu đúng tại **spot #57**. Vị trí này nằm **xuống 1 tầng** và **ngay cạnh thang máy LEVEL 2**. Vui lòng đậu xe đúng vị trí và không đậu sang ô khác.
+
+Lưu ý: đây là bãi xe dành cho cư dân, vì vậy vui lòng **không nhắc đến Airbnb** trong khu vực đậu xe.
+
+Sau khi đậu xe, đi đến thang máy, quét key fob và bấm **Level 4** (tương đương tầng trệt / ground level). Sau đó bạn có thể ra vào tự do.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+We hope you're excited for your upcoming stay. If you require parking, we can provide **one complimentary parking space**. Please let us know if we should reserve this spot for you.
+
+Parking is located at **152 Bulwara Road, Pyrmont NSW 2009**, approximately a **4-minute walk** from the apartment. The **key fob** is located with your **key set**, which we will send later. Please collect the fob from the keyset before entering the car park.
+
+When you arrive, tap the fob at the gate to enter, then park only in **spot #57**. This space is **one level down** and **right next to the LEVEL 2 lifts**. Please park correctly and do not use any other spot.
+
+Please note that this car park is intended for residents, so please **do not mention Airbnb** in the parking area.
+
+Once parked, go to the lifts, tap the fob and press **Level 4** (which is essentially ground level). You can exit freely after that.
+
+Thanks.`,
+      photos: [
+        {
+          storagePath: BUILTIN_CASINO_ENCLAVE_BUILDING,
+          captionVi: 'Mặt tiền The Darlington và lối xuống bãi xe tại 152 Bulwara Road.',
+          captionEn: 'The Darlington building and car park entrance at 152 Bulwara Road.',
+          url: builtinPhotoUrl(BUILTIN_CASINO_ENCLAVE_BUILDING),
+        },
+        {
+          storagePath: BUILTIN_CASINO_ENCLAVE_KEY_FOB,
+          captionVi: 'Quét key fob tại đầu đọc ở cổng bãi xe.',
+          captionEn: 'Tap the key fob at the car park gate reader.',
+          url: builtinPhotoUrl(BUILTIN_CASINO_ENCLAVE_KEY_FOB),
+        },
+        {
+          storagePath: BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS,
+          captionVi: 'Đi đến khu thang máy LEVEL 2 sau khi đậu xe.',
+          captionEn: 'Go to the LEVEL 2 lift area after parking.',
+          url: builtinPhotoUrl(BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS),
+        },
+        {
+          storagePath: BUILTIN_CASINO_ENCLAVE_SPOT_57,
+          captionVi: 'Đậu xe đúng tại parking spot #57.',
+          captionEn: 'Park only in parking spot #57.',
+          url: builtinPhotoUrl(BUILTIN_CASINO_ENCLAVE_SPOT_57),
+        },
+      ],
+    };
+  }
+
+  if (normalized.endsWith('corfu house | steps of cbd')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe đường phố miễn phí',
+      statusEn: 'Free street parking',
+      locationVi: 'Đậu xe trên đường gần căn hộ',
+      locationEn: 'Street parking near the apartment',
+      accessVi: 'Tuân theo biển báo đỗ xe trên đường',
+      accessEn: 'Follow the street parking signs',
+      spot: '',
+      mapUrl: '',
+      noteVi: 'Đậu xe miễn phí trên đường. Ngày thường thường giới hạn 2 giờ, sau khoảng 4:00 PM thường không giới hạn. Cuối tuần thường miễn phí không giới hạn. Luôn kiểm tra biển báo thực tế tại chỗ.',
+      noteEn: 'Free street parking is available. On weekdays it is typically limited to 2 hours, then usually becomes unlimited after around 4:00 PM. On weekends it is usually free and unlimited. Always check the street signs on arrival.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Có thể đậu xe **miễn phí trên đường** gần căn hộ.',
+        'Vào **ngày thường**, đậu xe thường giới hạn **2 giờ**.',
+        'Sau khoảng **4:00 PM**, chỗ đậu trên đường thường **không giới hạn thời gian**.',
+        'Vào **cuối tuần**, đậu xe trên đường thường **miễn phí và không giới hạn**.',
+        'Vui lòng luôn **kiểm tra biển báo tại vị trí đậu xe** để xác nhận điều kiện thực tế.',
+      ],
+      instructionsEn: [
+        'There is **free street parking** available near the apartment.',
+        'On **weekdays**, parking is typically limited to **2 hours**.',
+        'After around **4:00 PM**, street parking is usually **unlimited**.',
+        'On **weekends**, street parking is usually **free and unlimited**.',
+        'Please always **check the parking signs where you park** to confirm the current restrictions.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, bạn có thể sử dụng **đậu xe miễn phí trên đường** gần căn hộ.
+
+Ngày thường, chỗ đậu xe trên đường thường giới hạn **2 giờ**. Sau khoảng **4:00 PM**, thời gian đậu thường không giới hạn. Vào **cuối tuần**, chỗ đậu xe trên đường thường **miễn phí và không giới hạn**.
+
+Vui lòng luôn kiểm tra biển báo tại nơi đậu xe để xác nhận quy định thực tế.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, there is **free street parking** available near the apartment.
+
+On weekdays, street parking is typically limited to **2 hours**. After around **4:00 PM**, it is usually unlimited. On **weekends**, street parking is generally **free and unlimited**.
+
+Please always check the local parking signs where you park to confirm the current restrictions.
+
+Thanks.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('heavens panorama | water views')) {
+    return {
+      enabled: true,
+      statusVi: 'Có bãi xe trả phí tại chỗ',
+      statusEn: 'Affordable on-site paid parking',
+      locationVi: 'Bãi xe ngay tại chỗ / trong khuôn viên',
+      locationEn: 'On-site parking',
+      accessVi: 'Có thể đặt trước hoặc đặt khi đến',
+      accessEn: 'Can be pre-booked or booked on arrival',
+      spot: '',
+      mapUrl: '',
+      noteVi: 'Khách có thể pre-book chỗ đậu xe tại chỗ với mức phí khá hợp lý. Nếu chưa đặt trước, khách vẫn có thể đặt khi đến nơi.',
+      noteEn: 'Guests may pre-book on-site parking at an affordable cost. If not booked in advance, it can also be booked upon arrival.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Căn hộ có **bãi xe trả phí tại chỗ** với mức phí khá hợp lý.',
+        'Bạn có thể **đặt trước** chỗ đậu xe trước khi đến.',
+        'Nếu chưa đặt trước, bạn vẫn có thể **đặt khi đến nơi / upon arrival**.',
+        'Nếu cần hỗ trợ thêm, vui lòng nhắn cho bên mình.',
+      ],
+      instructionsEn: [
+        'There is **affordable on-site paid parking** available for this apartment.',
+        'You may **pre-book** your parking in advance.',
+        'If you do not pre-book it, you may also **book it upon arrival**.',
+        'Please message us if you need any further help with parking arrangements.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, bạn có thể sử dụng **bãi xe trả phí tại chỗ** với mức phí khá hợp lý.
+
+Bạn có thể **đặt trước** chỗ đậu xe. Nếu chưa đặt trước, bạn vẫn có thể **đặt khi đến nơi**.
+
+Nếu bạn cần hỗ trợ thêm về việc đậu xe, vui lòng nhắn cho bên mình.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, there is **affordable on-site paid parking** available.
+
+You may **pre-book** your parking in advance. If not, you may also **book it upon arrival**.
+
+Please let us know if you need any further assistance.
+
+Thank you.`,
+      photos: [],
+    };
+  }
+
+
   if (
-    normalized.endsWith('blue horizon • $1 million view')
+    (normalized.includes('blue horizon') && normalized.includes('$1 million'))
+    || normalized.endsWith('blue horizon • $1 million view')
     || normalized.endsWith('blue horizon - $1 million view')
   ) {
     return {
