@@ -93,6 +93,12 @@ const BUILTIN_CASINO_ENCLAVE_KEY_FOB = 'builtin:casino-enclave-key-fob';
 const BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS = 'builtin:casino-enclave-level-2-lifts';
 const BUILTIN_CASINO_ENCLAVE_SPOT_57 = 'builtin:casino-enclave-spot-57';
 const BUILTIN_MILLERS_MANOR_ENTRANCE = 'builtin:millers-manor-barangaroo-point';
+const BUILTIN_PANORAMIC_ESCAPE_OVERVIEW = 'builtin:panoramic-escape-overview';
+const BUILTIN_PANORAMIC_ESCAPE_SPOT_35 = 'builtin:panoramic-escape-spot-35';
+const BUILTIN_GRAND_PYRMONT_PRIVATE_BAY = 'builtin:grand-pyrmont-private-bay';
+const BUILTIN_GRAND_PYRMONT_LANE_DIRECTION = 'builtin:grand-pyrmont-lane-direction';
+const BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE = 'builtin:grand-pyrmont-complex-entrance';
+const BUILTIN_GRAND_PYRMONT_HOUSE_69 = 'builtin:grand-pyrmont-house-69';
 const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_BLISS_PHOTO]: BLISS_GARAGE_77_IMAGE,
   [BUILTIN_BLUE_ENCLAVE_KEY_FOB]: publicUrl('parking/blue-enclave-key-fob.jpg'),
@@ -103,6 +109,12 @@ const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS]: publicUrl('parking/casino-enclave-level-2-lifts.jpg'),
   [BUILTIN_CASINO_ENCLAVE_SPOT_57]: publicUrl('parking/casino-enclave-spot-57.jpg'),
   [BUILTIN_MILLERS_MANOR_ENTRANCE]: publicUrl('parking/millers-manor-barangaroo-point.jpg'),
+  [BUILTIN_PANORAMIC_ESCAPE_OVERVIEW]: publicUrl('parking/panoramic-escape-overview.jpg'),
+  [BUILTIN_PANORAMIC_ESCAPE_SPOT_35]: publicUrl('parking/panoramic-escape-spot-35.jpg'),
+  [BUILTIN_GRAND_PYRMONT_PRIVATE_BAY]: publicUrl('parking/grand-pyrmont-private-bay.jpg'),
+  [BUILTIN_GRAND_PYRMONT_LANE_DIRECTION]: publicUrl('parking/grand-pyrmont-lane-direction.jpg'),
+  [BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE]: publicUrl('parking/grand-pyrmont-complex-entrance.jpg'),
+  [BUILTIN_GRAND_PYRMONT_HOUSE_69]: publicUrl('parking/grand-pyrmont-house-69.jpg'),
 };
 const builtinPhotoUrl = (storagePath: string) => BUILTIN_PHOTO_URLS[storagePath] || '';
 const isBuiltinPhoto = (storagePath: string) => Boolean(BUILTIN_PHOTO_URLS[storagePath]);
@@ -484,6 +496,236 @@ Thank you.`,
     };
   }
 
+
+
+  if (
+    normalized.endsWith('panoramic escape: bridge & opera gem')
+    || normalized.endsWith('panoramic escape | bridge & opera gem')
+  ) {
+    return {
+      enabled: true,
+      statusVi: 'Chỗ đậu xe riêng đi kèm căn hộ',
+      statusEn: 'Dedicated parking space included',
+      locationVi: 'Khu đậu xe nằm giữa Robertson Lane và Fitzroy Street',
+      locationEn: 'Parking is located between Robertson Lane and Fitzroy Street',
+      accessVi: 'Đậu tại đúng chỗ số #35',
+      accessEn: 'Park only in spot #35',
+      spot: 'Parking spot #35',
+      mapUrl: 'https://maps.app.goo.gl/PAz6vceyRksXg6eP7?g_st=ic',
+      noteVi: 'Chỗ đậu xe của bạn là vị trí **#35**, tại đúng nơi chiếc xe màu xám đang đậu trong ảnh tham chiếu. Vui lòng chỉ đậu đúng vị trí này.',
+      noteEn: 'Your parking space is **#35**, located where the grey car is parked in the reference image. Please use only this designated bay.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Chỗ đậu xe nằm tại khu vực giữa **Robertson Lane** và **Fitzroy Street**.',
+        'Bản đồ: https://maps.app.goo.gl/PAz6vceyRksXg6eP7?g_st=ic',
+        'Vị trí của bạn là **parking spot #35**.',
+        'Hãy sử dụng các ảnh tham chiếu để xác định đúng khu đậu xe và đúng vị trí.',
+        'Chỗ của bạn là nơi chiếc xe mẫu đang đậu trong ảnh, vui lòng **chỉ đậu đúng ô #35**.',
+      ],
+      instructionsEn: [
+        'The parking area is located between **Robertson Lane** and **Fitzroy Street**.',
+        'Map link: https://maps.app.goo.gl/PAz6vceyRksXg6eP7?g_st=ic',
+        'Your space is **parking spot #35**.',
+        'Please use the reference photos to identify the correct parking area and the correct bay.',
+        'Your space is the one where the example car is parked in the image, so please **park only in spot #35**.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, chỗ đậu xe nằm giữa **Robertson Lane** và **Fitzroy Street**.
+
+Bản đồ: https://maps.app.goo.gl/PAz6vceyRksXg6eP7?g_st=ic
+
+Chỗ của bạn là **parking spot #35**. Vui lòng xem ảnh tham chiếu để xác định đúng vị trí — đó là nơi chiếc xe mẫu đang đậu trong ảnh.
+
+Vui lòng chỉ đậu đúng ô **#35**.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, your parking is located between **Robertson Lane** and **Fitzroy Street**.
+
+Map: https://maps.app.goo.gl/PAz6vceyRksXg6eP7?g_st=ic
+
+Your designated space is **parking spot #35**. Please refer to the images to identify the correct location — it is the bay where the example car is shown parked.
+
+Please park only in **spot #35**.
+
+Thank you.`,
+      photos: [
+        {
+          storagePath: BUILTIN_PANORAMIC_ESCAPE_OVERVIEW,
+          captionVi: 'Tổng quan khu đậu xe nhìn từ trên cao để xác định khu vực đúng.',
+          captionEn: 'Overview of the parking area from above to help identify the correct location.',
+          url: builtinPhotoUrl(BUILTIN_PANORAMIC_ESCAPE_OVERVIEW),
+        },
+        {
+          storagePath: BUILTIN_PANORAMIC_ESCAPE_SPOT_35,
+          captionVi: 'Đậu xe tại đúng vị trí được khoanh tròn / chỉ dẫn trong ảnh.',
+          captionEn: 'Park in the exact bay highlighted in the reference image.',
+          url: builtinPhotoUrl(BUILTIN_PANORAMIC_ESCAPE_SPOT_35),
+        },
+      ],
+    };
+  }
+
+  if (normalized.endsWith('sun-lit oasis | darling harbour')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe đường phố có trả phí hoặc bãi gần đó',
+      statusEn: 'Timed paid street parking or nearby car park',
+      locationVi: 'Đậu xe trên đường hoặc Secure Parking Harris Street',
+      locationEn: 'Street parking or Secure Parking Harris Street',
+      accessVi: 'Đậu xe trên đường có giới hạn hoặc đặt bãi xe gần đó',
+      accessEn: 'Use timed street parking or a nearby paid car park',
+      spot: '',
+      mapUrl: 'https://www.secureparking.com.au/en-au/car-parks/australia/nsw/harris-street-sydney-car-park/',
+      noteVi: 'Không có parking miễn phí trong accommodation. Có đậu xe trên đường có thu phí theo thời gian, hoặc có thể dùng Secure Parking Harris Street — thường là một trong những lựa chọn rẻ nhất trong khu vực. Đậu xe trên đường thường giới hạn 2 giờ và hay được kiểm tra.',
+      noteEn: 'There is no free parking included with the accommodation. Timed paid street parking is available, or you can use Secure Parking Harris Street, which is often one of the cheaper nearby options. Street parking is usually limited to 2 hours and is checked regularly.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Hiện tại **không có parking miễn phí** đi kèm accommodation.',
+        'Bạn có thể dùng **đậu xe trên đường có trả phí theo thời gian** gần căn hộ.',
+        'Đậu xe trên đường **thường giới hạn 2 giờ** và khu vực này **kiểm tra khá thường xuyên**.',
+        'Nếu muốn phương án gần và hợp lý hơn, bạn có thể sử dụng **Secure Parking Harris Street**:',
+        'https://www.secureparking.com.au/en-au/car-parks/australia/nsw/harris-street-sydney-car-park/',
+        'Đây thường là **một trong những lựa chọn rẻ nhất trong khu vực**.',
+      ],
+      instructionsEn: [
+        'At the moment, there is **no free parking included** with the accommodation.',
+        'You may use **timed paid street parking** near the apartment.',
+        'Street parking is **usually limited to 2 hours** and the area is **checked quite often**.',
+        'If you prefer a nearby paid option, you may use **Secure Parking Harris Street**:',
+        'https://www.secureparking.com.au/en-au/car-parks/australia/nsw/harris-street-sydney-car-park/',
+        'This is often **one of the cheapest parking options in the area**.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, hiện tại **không có parking miễn phí** đi kèm chỗ ở.
+
+Bạn có thể sử dụng **đậu xe trên đường có trả phí theo thời gian**, tuy nhiên chỗ đậu trên đường thường **giới hạn 2 giờ** và khá hay được kiểm tra.
+
+Nếu muốn một lựa chọn gần đó với chi phí hợp lý, bạn có thể dùng **Secure Parking Harris Street**:
+https://www.secureparking.com.au/en-au/car-parks/australia/nsw/harris-street-sydney-car-park/
+
+Đây thường là một trong những lựa chọn rẻ nhất trong khu vực.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, unfortunately there is **no free parking included** with the accommodation.
+
+You may use **timed paid street parking**, but street parking is usually **limited to 2 hours** and is checked quite often.
+
+A nearby paid option is **Secure Parking Harris Street**:
+https://www.secureparking.com.au/en-au/car-parks/australia/nsw/harris-street-sydney-car-park/
+
+This is often one of the cheapest parking options in the area.
+
+Thank you.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('the grand pyrmont | casino & harbour')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe riêng trong khu GRANDE',
+      statusEn: 'Private parking inside the GRANDE complex',
+      locationVi: 'Bãi xe trong khu GRANDE, kết nối trực tiếp với nhà',
+      locationEn: 'Parking inside the GRANDE complex, directly connected to the house',
+      accessVi: 'Dùng remote xanh cho cổng chung, remote đen cho cửa gara riêng',
+      accessEn: 'Use the blue-button remote for the main gate and the black remote for the private bay',
+      spot: 'Ô gần nhất còn trống / gara riêng nối vào nhà',
+      mapUrl: '',
+      noteVi: 'Đây là khu đậu xe dân cư dùng chung. Vui lòng không nhắc đến Airbnb hoặc short-stay accommodation. Sau khi vào hoặc rời gara, hãy nhớ đóng lại cửa gara/cổng đậu xe của bạn.',
+      noteEn: 'This is a shared residential parking area. Please avoid mentioning Airbnb or short-stay accommodation. Remember to close your parking gate/bay door after entering or leaving.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Trước tiên hãy dùng **remote có các nút màu xanh**.',
+        'Nhấn **nút xanh góc trên bên phải** để mở cổng vào khu **GRANDE building**.',
+        'Sau khi vào bên trong, vị trí của bạn sẽ là **ô đậu gần nhất còn trống / khu đậu được cấp cho căn nhà** như trong ảnh hướng dẫn.',
+        'Để mở **gara / parking bay riêng**, dùng **remote màu đen** và nhấn **nút xám ở bên phải**.',
+        'Khu đậu xe này **kết nối trực tiếp với căn nhà**. Bạn có thể vào nhà qua **cửa nối ở phía sau**.',
+        'Sau khi đỗ xe hoặc khi rời đi, vui lòng **đóng lại cổng/cửa gara của chỗ đậu xe**.',
+        'Đây là **khu đậu xe dân cư dùng chung**, vì vậy vui lòng **không nhắc đến Airbnb, short-stay hoặc thuê ngắn ngày** trong thời gian lưu trú.',
+      ],
+      instructionsEn: [
+        'Please use the **remote with the blue buttons first**.',
+        'Press the **top-right blue button** to open the gate to the **GRANDE building**.',
+        'Once inside, your allocated parking space will be the **closest available car park / designated bay for the house**, as shown in the reference photos.',
+        'To open your **private parking bay**, use the **black parking remote** and press the **grey button on the right**.',
+        'The parking area **connects directly to the house**. You can access the property through the **connected door at the rear**.',
+        'Please remember to **close the parking gate / bay door** after entering or leaving.',
+        'This is a **shared residential parking area**, so please avoid mentioning **Airbnb, short-stay accommodation, or holiday rental** during your stay.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, vui lòng làm theo hướng dẫn đậu xe sau:
+
+1. Dùng **remote có các nút màu xanh** trước.
+2. Nhấn **nút xanh góc trên bên phải** để mở cổng vào khu **GRANDE building**.
+3. Sau khi vào trong, vị trí đậu xe của bạn sẽ là **ô gần nhất còn trống / khu đậu được cấp cho căn nhà** như trong ảnh hướng dẫn.
+4. Để mở **gara / parking bay riêng**, dùng **remote màu đen** và nhấn **nút xám ở bên phải**.
+5. Khu đậu xe này **kết nối trực tiếp với căn nhà**, và bạn có thể vào nhà bằng **cửa ở phía sau**.
+6. Sau khi vào hoặc rời đi, vui lòng **đóng lại cổng/cửa gara**.
+
+Lưu ý: đây là **khu đậu xe dân cư dùng chung**, vì vậy vui lòng **không nhắc đến Airbnb hoặc short-stay accommodation** trong thời gian lưu trú.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, please follow these parking instructions:
+
+1. Use the **remote with the blue buttons first**.
+2. Press the **top-right blue button** to open the gate to the **GRANDE building**.
+3. Once inside, your parking space will be the **closest available bay / designated bay for the house**, as shown in the reference photos.
+4. To open your **private parking bay**, use the **black parking remote** and press the **grey button on the right**.
+5. The parking area **connects directly to the house**, and you can enter the property through the **connected rear door**.
+6. Please remember to **close the parking gate / bay door** after entering or leaving.
+
+Friendly note: this is a **shared residential parking area**, so please avoid mentioning **Airbnb or short-stay accommodation** during your stay.
+
+Thank you.`,
+      photos: [
+        {
+          storagePath: BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE,
+          captionVi: 'Lối vào khu GRANDE và cổng xuống bãi xe.',
+          captionEn: 'Entrance to the GRANDE complex and vehicle gate.',
+          url: builtinPhotoUrl(BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE),
+        },
+        {
+          storagePath: BUILTIN_GRAND_PYRMONT_LANE_DIRECTION,
+          captionVi: 'Hướng di chuyển bên trong khu bãi xe sau khi vào cổng chính.',
+          captionEn: 'Direction of travel inside the parking area after entering the main gate.',
+          url: builtinPhotoUrl(BUILTIN_GRAND_PYRMONT_LANE_DIRECTION),
+        },
+        {
+          storagePath: BUILTIN_GRAND_PYRMONT_PRIVATE_BAY,
+          captionVi: 'Khu gara / parking bay riêng kết nối trực tiếp với nhà qua cửa phía sau.',
+          captionEn: 'Private parking bay connected directly to the house through the rear door.',
+          url: builtinPhotoUrl(BUILTIN_GRAND_PYRMONT_PRIVATE_BAY),
+        },
+        {
+          storagePath: BUILTIN_GRAND_PYRMONT_HOUSE_69,
+          captionVi: 'Mặt tiền căn nhà số 69 trong khu GRANDE Pyrmont Bay Estate.',
+          captionEn: 'Front exterior of house number 69 inside the GRANDE Pyrmont Bay Estate.',
+          url: builtinPhotoUrl(BUILTIN_GRAND_PYRMONT_HOUSE_69),
+        },
+      ],
+    };
+  }
 
 
   if (normalized.endsWith('luxury 1bdr | sparkling harbourside')) {
