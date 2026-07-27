@@ -92,6 +92,7 @@ const BUILTIN_CASINO_ENCLAVE_BUILDING = 'builtin:casino-enclave-building';
 const BUILTIN_CASINO_ENCLAVE_KEY_FOB = 'builtin:casino-enclave-key-fob';
 const BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS = 'builtin:casino-enclave-level-2-lifts';
 const BUILTIN_CASINO_ENCLAVE_SPOT_57 = 'builtin:casino-enclave-spot-57';
+const BUILTIN_MILLERS_MANOR_ENTRANCE = 'builtin:millers-manor-barangaroo-point';
 const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_BLISS_PHOTO]: BLISS_GARAGE_77_IMAGE,
   [BUILTIN_BLUE_ENCLAVE_KEY_FOB]: publicUrl('parking/blue-enclave-key-fob.jpg'),
@@ -101,6 +102,7 @@ const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_CASINO_ENCLAVE_KEY_FOB]: publicUrl('parking/casino-enclave-key-fob.jpg'),
   [BUILTIN_CASINO_ENCLAVE_LEVEL_2_LIFTS]: publicUrl('parking/casino-enclave-level-2-lifts.jpg'),
   [BUILTIN_CASINO_ENCLAVE_SPOT_57]: publicUrl('parking/casino-enclave-spot-57.jpg'),
+  [BUILTIN_MILLERS_MANOR_ENTRANCE]: publicUrl('parking/millers-manor-barangaroo-point.jpg'),
 };
 const builtinPhotoUrl = (storagePath: string) => BUILTIN_PHOTO_URLS[storagePath] || '';
 const isBuiltinPhoto = (storagePath: string) => Boolean(BUILTIN_PHOTO_URLS[storagePath]);
@@ -563,6 +565,96 @@ Thank you.`,
       messageVi: `Xin chào,\n\nĐối với căn **${apartment}** tại **38 York Street, Sydney NSW 2000**, xin lưu ý rằng **tòa nhà không có parking**.\n\nBên mình khuyến nghị sử dụng phương tiện công cộng vì đây là lựa chọn nhanh và thuận tiện nhất: căn hộ cách **Wynyard Station khoảng 5 phút đi bộ** và cách trạm **light rail khoảng 4 phút**.\n\nNếu bạn cần lái xe, có thể đặt trước các bãi xe sau:\n\n1. 383 Kent Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/\n\n2. George Place Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#\nLưu ý: bãi này không mở 24 giờ. Bạn có thể để xe bên trong trong giờ đóng cửa nhưng sẽ không thể tiếp cận xe.\n\n3. 71 York Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#\n\nBạn có thể đặt qua app/online hoặc drive-in, nhưng **đặt trước thường rẻ hơn**.\n\nCảm ơn bạn.`,
       messageEn: `Hi,\n\nFor **${apartment}** at **38 York Street, Sydney NSW 2000**, please note that **there is no parking in the building**.\n\nWe recommend public transport because it is the quickest and most convenient option. The apartment is approximately a **5-minute walk from Wynyard Station** and **4 minutes from the light rail stop**.\n\nIf you need to drive, you may pre-book one of the following nearby options:\n\n1. 383 Kent Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/cbd-sydney-south/383-kent-st-car-park/\n\n2. George Place Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/george-place-car-park/#\nPlease note that this car park is not accessible 24 hours. You may leave the car inside during closed hours, but you cannot access it while the car park is closed.\n\n3. 71 York Street Car Park\nhttps://www.wilsonparking.com.au/parking-locations/new-south-wales/sydney-cbd/71-york-st-car-park/?utm_source=Google&utm_medium=GMB&utm_campaign=google_NSW-71-york-st&utm_term=plcid_17036516862398035298#\n\nYou can book through the app/online or drive in, but **pre-booking is usually cheaper**.\n\nHope this helps.`,
       photos: [],
+    };
+  }
+
+
+  if (normalized.endsWith('maritime manor | coastal terrace')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe miễn phí có giới hạn thời gian',
+      statusEn: 'Time-limited free parking available',
+      locationVi: 'Đậu xe trên đường và bãi xe có mái che gần căn hộ',
+      locationEn: 'Street parking and nearby undercover parking',
+      accessVi: 'Tuân theo biển báo và giới hạn thời gian tại chỗ',
+      accessEn: 'Follow the posted signs and time limits',
+      spot: '',
+      mapUrl: '',
+      noteVi: 'Có chỗ đậu xe miễn phí trên đường trong khoảng 1–2 giờ. Gần đó cũng có bãi xe có mái che miễn phí tối đa 2 giờ. Vui lòng kiểm tra biển báo và điều kiện thực tế khi đến.',
+      noteEn: 'Free street parking is available for approximately 1–2 hours. There is also nearby free undercover parking for up to 2 hours. Please check the posted signs and current conditions on arrival.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Có thể sử dụng **đậu xe miễn phí trên đường** gần căn hộ trong khoảng **1–2 giờ**.',
+        'Gần đó cũng có **bãi xe có mái che miễn phí tối đa 2 giờ**.',
+        'Các giới hạn có thể thay đổi theo vị trí và thời điểm, vì vậy vui lòng **kiểm tra biển báo tại chỗ** trước khi rời xe.',
+        'Nếu cần đậu lâu hơn, hãy cân nhắc di chuyển xe hoặc sử dụng một bãi xe trả phí gần đó.',
+      ],
+      instructionsEn: [
+        'There is **free street parking** available near the apartment for approximately **1–2 hours**.',
+        'There is also **free undercover parking nearby for up to 2 hours**.',
+        'Restrictions may vary by location and time, so please **check the signs where you park** before leaving the vehicle.',
+        'For a longer stay, please consider moving the car or using a nearby paid car park.',
+      ],
+      messageVi: `Xin chào,\n\nĐối với căn **${apartment}**, gần căn hộ có **đậu xe miễn phí trên đường trong khoảng 1–2 giờ**.\n\nNgoài ra, gần đó cũng có **bãi xe có mái che miễn phí tối đa 2 giờ**.\n\nVui lòng kiểm tra biển báo tại vị trí đậu xe vì giới hạn có thể thay đổi theo khu vực và thời điểm. Nếu cần đậu lâu hơn, bạn nên di chuyển xe hoặc sử dụng một bãi xe trả phí gần đó.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nFor **${apartment}**, there is **free street parking nearby for approximately 1–2 hours**.\n\nThere is also **free undercover parking nearby for up to 2 hours**.\n\nPlease check the signs where you park, as restrictions may vary by location and time. For a longer stay, you may need to move the car or use a nearby paid car park.\n\nThank you.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('millers manor terrace | 3br')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe tại Barangaroo Point bằng access card',
+      statusEn: 'Barangaroo Point parking with access card',
+      locationVi: 'Barangaroo Point Car Park · 25 Hickson Road, Barangaroo',
+      locationEn: 'Barangaroo Point Car Park · 25 Hickson Road, Barangaroo',
+      accessVi: 'Chạm access card vào đèn/cảm biến màu xanh tại cổng',
+      accessEn: 'Hold the access card against the green sensor/light at the gate',
+      spot: 'Chỉ đậu ô không ghi RESERVED',
+      mapUrl: 'https://share.google/LiueHkocRqNSRvSnZ',
+      noteVi: 'Chỉ sử dụng đúng Barangaroo Point Wilson Parking, không vào Bond One hoặc bãi Wilson khác. Bãi đóng lúc nửa đêm nhưng được phép đậu qua đêm. Access card bị mất hoặc không trả lại keybox sẽ chịu phí thay thế $300.',
+      noteEn: 'Use only the designated Barangaroo Point Wilson Parking location, not Bond One or any other Wilson car park. The car park closes at midnight, but overnight parking is permitted. A lost or unreturned access card incurs a $300 replacement fee.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Bãi xe nằm tại **Barangaroo Point Car Park**, địa chỉ **25 Hickson Road, Barangaroo**.',
+        'Google Maps: https://share.google/LiueHkocRqNSRvSnZ',
+        'Chỉ đi vào đúng bãi **“Barangaroo Point” Wilson Parking**. Không sử dụng **“Bond One”** hoặc bất kỳ bãi Wilson nào khác vì có thể bị phạt.',
+        'Chỉ đậu tại các ô **không ghi “RESERVED”**. Nếu tầng B2 đã hết chỗ phù hợp, tiếp tục đi xuống các tầng thấp hơn để tìm ô không dành riêng.',
+        'Để vào và ra, giữ **access card** sát **đèn/cảm biến màu xanh** tại cổng.',
+        'Boom gate chỉ hoạt động khi hệ thống nhận biết bạn đang **ngồi trong xe**, vì vậy hãy thực hiện thao tác từ bên trong phương tiện.',
+        'Bãi xe đóng cửa lúc **12:00 AM / midnight**, nhưng **được phép đậu xe qua đêm**.',
+        'Ngoài ra, khu vực gần đó thường có **đậu xe miễn phí trên đường từ khoảng 10:00 PM đến buổi sáng**. Luôn kiểm tra biển báo.',
+        '⚠️ **Quan trọng:** access card bị mất hoặc không được trả lại keybox sẽ chịu **phí thay thế $300**, được trừ từ phương thức thanh toán của khách.',
+      ],
+      instructionsEn: [
+        'Parking is located at **Barangaroo Point Car Park**, **25 Hickson Road, Barangaroo**.',
+        'Google Maps: https://share.google/LiueHkocRqNSRvSnZ',
+        'Use only the designated **“Barangaroo Point” Wilson Parking** location. Do not enter **“Bond One”** or any other Wilson car park, as fines may apply.',
+        'Park only in spaces that are **not marked “RESERVED”**. If suitable bays are unavailable on B2, continue down a few levels to find non-reserved spaces.',
+        'To enter and exit, hold the **access card** against the **green sensor/light** at the boom gate.',
+        'The boom gate operates only while the system detects that you are **inside a vehicle**, so use the access card from inside the car.',
+        'The car park closes at **midnight**, but **overnight parking is fully permitted**.',
+        'Free street parking is also usually available nearby from approximately **10:00 PM until the morning**. Always check the signs.',
+        '⚠️ **Important:** a lost or unreturned access card incurs a **$300 replacement fee**, which will be deducted from the guest’s payment method if it is not returned to the keybox.',
+      ],
+      messageVi: `Xin chào,\n\nNếu bạn cần đậu xe cho căn **${apartment}**, vui lòng sử dụng **Barangaroo Point Car Park** tại **25 Hickson Road, Barangaroo**:\nhttps://share.google/LiueHkocRqNSRvSnZ\n\nHãy chắc chắn bạn vào đúng bãi **Barangaroo Point Wilson Parking**, không phải **Bond One** hoặc bãi Wilson khác. Chỉ đậu tại các ô **không ghi RESERVED**; nếu cần, hãy tiếp tục xuống các tầng thấp hơn B2 để tìm ô phù hợp.\n\nĐể vào và ra, giữ access card sát **đèn/cảm biến màu xanh** tại cổng. Boom gate chỉ hoạt động khi bạn đang ở trong xe.\n\nBãi xe đóng lúc nửa đêm nhưng được phép đậu qua đêm. Gần đó cũng thường có đậu xe miễn phí trên đường từ khoảng 10:00 PM đến buổi sáng, nhưng vui lòng kiểm tra biển báo.\n\n⚠️ **Quan trọng:** nếu access card bị mất hoặc không được trả lại keybox, phí thay thế **$300** sẽ được trừ từ phương thức thanh toán của bạn.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nIf you require parking for **${apartment}**, please use **Barangaroo Point Car Park** at **25 Hickson Road, Barangaroo**:\nhttps://share.google/LiueHkocRqNSRvSnZ\n\nPlease make sure you enter the designated **Barangaroo Point Wilson Parking** location, not **Bond One** or any other Wilson car park. Park only in spaces that are **not marked RESERVED**; if needed, continue down below B2 to find an available non-reserved bay.\n\nTo enter and exit, hold the access card against the **green sensor/light** at the gate. The boom gate operates only while you are inside a vehicle.\n\nThe car park closes at midnight, but overnight parking is fully permitted. Free street parking is also usually available nearby from around 10:00 PM until the morning, subject to the signs.\n\n⚠️ **Important:** a lost or unreturned access card incurs a **$300 replacement fee**, which will be deducted from your payment method if the card is not returned to the keybox.\n\nThank you.`,
+      photos: [
+        {
+          storagePath: BUILTIN_MILLERS_MANOR_ENTRANCE,
+          captionVi: 'Lối vào Barangaroo Point Car Park tại 25 Hickson Road, Barangaroo.',
+          captionEn: 'Barangaroo Point Car Park entrance at 25 Hickson Road, Barangaroo.',
+          url: builtinPhotoUrl(BUILTIN_MILLERS_MANOR_ENTRANCE),
+        },
+      ],
     };
   }
 
