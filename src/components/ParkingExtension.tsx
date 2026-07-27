@@ -35,6 +35,7 @@ import {
 import { auth, db, storage } from '../firebase';
 import { useApartmentData } from '../data/ApartmentDataProvider';
 import { useUiLanguage } from '../i18n';
+import { publicUrl } from '../utils/publicUrl';
 import { BLISS_GARAGE_77_IMAGE } from '../assets/parkingImages';
 
 type Lang = 'vi' | 'en';
@@ -58,6 +59,11 @@ type ParkingGuideData = {
   mapUrl: string;
   noteVi: string;
   noteEn: string;
+  internalNoteVi: string;
+  internalNoteEn: string;
+  internalEmailTo: string;
+  internalEmailSubject: string;
+  internalEmailBody: string;
   instructionsVi: string[];
   instructionsEn: string[];
   messageVi: string;
@@ -79,6 +85,17 @@ type PendingPhoto = {
 };
 
 const BUILTIN_BLISS_PHOTO = 'builtin:bliss-garage-77';
+const BUILTIN_BLUE_ENCLAVE_KEY_FOB = 'builtin:blue-enclave-key-fob';
+const BUILTIN_BLUE_ENCLAVE_BUILDING = 'builtin:blue-enclave-building';
+const BUILTIN_BLUE_ENCLAVE_SPOT_64 = 'builtin:blue-enclave-spot-64';
+const BUILTIN_PHOTO_URLS: Record<string, string> = {
+  [BUILTIN_BLISS_PHOTO]: BLISS_GARAGE_77_IMAGE,
+  [BUILTIN_BLUE_ENCLAVE_KEY_FOB]: publicUrl('parking/blue-enclave-key-fob.jpg'),
+  [BUILTIN_BLUE_ENCLAVE_BUILDING]: publicUrl('parking/blue-enclave-building.jpg'),
+  [BUILTIN_BLUE_ENCLAVE_SPOT_64]: publicUrl('parking/blue-enclave-spot-64.jpg'),
+};
+const builtinPhotoUrl = (storagePath: string) => BUILTIN_PHOTO_URLS[storagePath] || '';
+const isBuiltinPhoto = (storagePath: string) => Boolean(BUILTIN_PHOTO_URLS[storagePath]);
 const card = 'rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900';
 const btn = 'inline-flex items-center justify-center gap-1.5 rounded-xl font-extrabold transition';
 const hasOwn = (value: Record<string, unknown>, key: string) => Object.prototype.hasOwnProperty.call(value, key);
@@ -97,6 +114,11 @@ function emptyParking(): ParkingGuideData {
     mapUrl: '',
     noteVi: '',
     noteEn: '',
+    internalNoteVi: '',
+    internalNoteEn: '',
+    internalEmailTo: '',
+    internalEmailSubject: '',
+    internalEmailBody: '',
     instructionsVi: [],
     instructionsEn: [],
     messageVi: '',
@@ -124,6 +146,11 @@ function defaultParkingFor(apartment: string): ParkingGuideData | null {
       mapUrl: '',
       noteVi: 'Không có thẻ đậu xe cần nhận. Hãy giữ hóa đơn hoặc xác nhận đặt chỗ để được hoàn lại chi phí.',
       noteEn: 'There is no parking card to collect. Keep the receipt or booking confirmation for reimbursement.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
       instructionsVi: [
         'Bãi đậu xe nằm ngoài tòa nhà, cách căn hộ khoảng **3–4 phút đi bộ**.',
         'Khách có thể dùng **tap & pay** hoặc **đặt chỗ trước**.',
@@ -155,6 +182,11 @@ function defaultParkingFor(apartment: string): ParkingGuideData | null {
       mapUrl: 'https://www.google.com/maps/search/?api=1&query=1-19+Allen+Street+Pyrmont+NSW',
       noteVi: 'Đây là khu dân cư. Không nhắc đến Airbnb. Nếu được hỏi, hãy nói bạn là bạn của chủ chỗ đậu xe.',
       noteEn: 'This is a residential building. Do not mention Airbnb. If asked, say you are a friend of the parking owner.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
       instructionsVi: [
         'Nhận **bộ chìa khóa và remote fob** từ hộp thư trước.',
         'Đi đến **1–19 Allen Street, Pyrmont** và dùng remote fob để vào bãi xe.',
@@ -180,6 +212,106 @@ function defaultParkingFor(apartment: string): ParkingGuideData | null {
     };
   }
 
+
+  if (normalized.endsWith('blue enclave | casino & darling harbour walk')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe miễn phí · cần đặt trước',
+      statusEn: 'Free parking · reservation required',
+      locationVi: '152 Bulwara Road, Pyrmont NSW 2009 · cách căn hộ khoảng 4 phút đi bộ',
+      locationEn: '152 Bulwara Road, Pyrmont NSW 2009 · approximately a 4-minute walk',
+      accessVi: 'Nhận key fob từ hộp thư trước rồi quét tại cổng',
+      accessEn: 'Collect the key fob from the mailbox first, then scan it at the gate',
+      spot: 'Parking spot #64',
+      mapUrl: 'https://www.google.com/maps/search/?api=1&query=152+Bulwara+Road+Pyrmont+NSW+2009',
+      noteVi: 'Hãy nhắn “PARKING NEEDED” để bên mình giữ chỗ. Chỉ đậu đúng ô #64. Không nhắc đến Airbnb; nếu được hỏi, hãy nói bạn là bạn của chủ chỗ đậu xe. Phần lớn kích thước và chiều cao xe thông thường đều phù hợp.',
+      noteEn: 'Reply “PARKING NEEDED” so we can reserve the space. Park only in spot #64. Do not mention Airbnb; if asked, say you are a friend of the parking owner. Most standard car sizes and heights should fit.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Nhắn **“PARKING NEEDED”** trước kỳ lưu trú để bên mình giữ chỗ miễn phí.',
+        'Nhận **key fob** từ hộp thư cùng bộ chìa khóa trước khi đi đến bãi xe.',
+        'Đi đến **152 Bulwara Road, Pyrmont NSW 2009**, cách căn hộ khoảng **4 phút đi bộ**.',
+        'Đảm bảo bạn đang ở đúng bãi xe. Quét key fob tại đầu đọc cạnh cổng; nếu đúng bãi, cổng sẽ nhận thẻ và mở.',
+        'Chỉ đậu tại **parking spot #64**. Không đậu nhầm sang bất kỳ vị trí nào khác.',
+        'Đây là bãi xe dành cho cư dân. Không nhắc đến **Airbnb**; nếu được hỏi, hãy nói bạn là bạn của chủ chỗ đậu xe.',
+        'Ngoài ra, thường có thể đậu xe miễn phí trên đường từ khoảng **10:00 PM đến 7:00 AM**, nhưng phải kiểm tra biển báo tại chỗ.',
+      ],
+      instructionsEn: [
+        'Reply **“PARKING NEEDED”** before your stay so we can reserve the complimentary space.',
+        'Collect the **key fob** from our mailbox together with the keyset before going to the car park.',
+        'Go to **152 Bulwara Road, Pyrmont NSW 2009**, approximately a **4-minute walk** from the apartment.',
+        'Make sure you are at the correct car park. Scan the key fob at the reader beside the gate; the gate should recognise it and open.',
+        'Park only in **parking spot #64**. Do not park in any other space.',
+        'This parking is normally for building residents. Do not mention **Airbnb**; if asked, say you are a friend of the parking owner.',
+        'Free street parking is also usually available from approximately **10:00 PM to 7:00 AM**, subject to the signs displayed on the street.',
+      ],
+      messageVi: `Xin chào,\n\nHy vọng bạn đang háo hức cho kỳ nghỉ sắp tới. Nếu bạn cần đậu xe, bên mình hiện có thể cung cấp một chỗ đậu xe miễn phí. Vui lòng trả lời **“PARKING NEEDED”** để bên mình giữ chỗ cho bạn.\n\nBãi xe nằm tại **152 Bulwara Road, Pyrmont NSW 2009**, cách căn hộ khoảng 4 phút đi bộ. Bạn cần nhận key fob từ hộp thư trước, sau đó quét key fob tại cổng. Hãy chắc chắn bạn đến đúng bãi xe.\n\nVui lòng chỉ đậu tại **parking spot #64** và không đậu nhầm vị trí khác. Phần lớn kích thước và chiều cao xe thông thường đều phù hợp.\n\nĐây là bãi xe dành cho cư dân, vì vậy vui lòng không nhắc đến Airbnb. Nếu được hỏi, bạn có thể nói mình là bạn của chủ chỗ đậu xe.\n\nNgoài ra, thường có chỗ đậu xe miễn phí trên đường từ khoảng 10:00 PM đến 7:00 AM, nhưng vui lòng luôn kiểm tra biển báo tại chỗ.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nWe hope you're excited for your upcoming stay. If you require parking, we recently upgraded our stay amenities to include a complimentary space. Please reply **“PARKING NEEDED”** so we can reserve it for you.\n\nParking is located at **152 Bulwara Road, Pyrmont NSW 2009**, approximately a 4-minute walk from the apartment. Please collect the key fob from our mailbox first, then scan it at the car park gate. Make sure you are at the correct car park.\n\nPlease park only in **spot #64** and do not use any other space. Most standard car sizes and heights should fit.\n\nThis parking is normally for building residents, so please do not mention Airbnb. If asked, you may say you are a friend of the parking owner.\n\nFree street parking is also usually available between approximately 10:00 PM and 7:00 AM, but please check the street signs.\n\nThanks.`,
+      photos: [
+        {
+          storagePath: BUILTIN_BLUE_ENCLAVE_BUILDING,
+          captionVi: 'Mặt tiền The Darlington và lối xuống bãi xe tại 152 Bulwara Road.',
+          captionEn: 'The Darlington building and car park entrance at 152 Bulwara Road.',
+          url: builtinPhotoUrl(BUILTIN_BLUE_ENCLAVE_BUILDING),
+        },
+        {
+          storagePath: BUILTIN_BLUE_ENCLAVE_KEY_FOB,
+          captionVi: 'Quét key fob tại đầu đọc cạnh cổng bãi xe.',
+          captionEn: 'Scan the key fob at the reader beside the car park gate.',
+          url: builtinPhotoUrl(BUILTIN_BLUE_ENCLAVE_KEY_FOB),
+        },
+        {
+          storagePath: BUILTIN_BLUE_ENCLAVE_SPOT_64,
+          captionVi: 'Đậu xe đúng tại parking spot #64.',
+          captionEn: 'Park only in parking spot #64.',
+          url: builtinPhotoUrl(BUILTIN_BLUE_ENCLAVE_SPOT_64),
+        },
+      ],
+    };
+  }
+
+  if (
+    normalized.endsWith('blue horizon • $1 million view')
+    || normalized.endsWith('blue horizon - $1 million view')
+  ) {
+    return {
+      enabled: true,
+      statusVi: 'Cần đăng ký biển số xe',
+      statusEn: 'Car plate registration required',
+      locationVi: 'Bãi xe trong khuôn viên tòa nhà',
+      locationEn: 'On-site building parking',
+      accessVi: 'Gửi CAR PLATE để BQL đăng ký trước',
+      accessEn: 'Send your CAR PLATE for advance registration',
+      spot: '',
+      mapUrl: '',
+      noteVi: 'Khách cần gửi biển số xe trước khi đến. Nếu chưa biết biển số, vui lòng báo lại để bên mình hỗ trợ.',
+      noteEn: 'Please send us your car plate before arrival. If you do not know it yet, let us know.',
+      internalNoteVi: 'Cần gửi email đăng ký biển số đến Ban quản lý tòa nhà trước khi khách sử dụng bãi xe. Nội dung này chỉ dành cho đội vận hành và không hiển thị ở Parking Guide của khách.',
+      internalNoteEn: 'Email building management to register the guest vehicle before parking. This information is internal only and is not shown in the guest Parking Guide.',
+      internalEmailTo: 'harbourside@networkfm.com.au',
+      internalEmailSubject: 'Guest parking registration – 28/2A Henry Lawson Avenue – [CAR PLATE]',
+      internalEmailBody: `Dear Building Management,\n\nGood day!\n\nPlease be advised that the plate number of our guest at 28/2A Henry Lawson Avenue, for parking registration, is [CAR PLATE], to be parked within the premises of the building starting [CHECK-IN TIME] on [CHECK-IN DATE] until [CHECK-OUT TIME] on [CHECK-OUT DATE]. We trust this information will assist in guiding and accommodating our guests accordingly.\n\nWe sincerely appreciate your kind assistance with the access arrangements.\n\nKind regards,\nNathan’s Team`,
+      instructionsVi: [
+        'Nếu cần đậu xe, hãy gửi cho bên mình **CAR PLATE / biển số xe**.',
+        'Bên mình sẽ chuyển biển số cho **Ban quản lý tòa nhà** để đăng ký quyền vào bãi xe.',
+        'Nếu bạn chưa biết biển số xe, vui lòng báo lại cho bên mình.',
+        'Chỉ sử dụng bãi xe sau khi bên mình xác nhận việc đăng ký đã được xử lý.',
+      ],
+      instructionsEn: [
+        'If you require parking, please send us your **CAR PLATE**.',
+        'We will forward the plate number to **building management** for parking registration.',
+        'If you do not know the plate number yet, please let us know.',
+        'Please use the building parking only after we confirm that the registration has been arranged.',
+      ],
+      messageVi: `Xin chào,\n\nDo tòa nhà vừa áp dụng hệ thống boom gate mới, nếu bạn cần đậu xe, vui lòng gửi cho bên mình **CAR PLATE / biển số xe**.\n\nBên mình sẽ chuyển thông tin này đến Ban quản lý tòa nhà để đăng ký quyền đậu xe cho kỳ lưu trú của bạn.\n\nNếu bạn chưa biết biển số xe, vui lòng báo lại cho bên mình.\n\nCảm ơn bạn.`,
+      messageEn: `Hi,\n\nAs part of the building's new boom gate system, if you require parking, please send us your **CAR PLATE** so we can forward it to building management for parking registration.\n\nIf you do not know this information yet, please let us know.\n\nThank you.`,
+      photos: [],
+    };
+  }
   return null;
 }
 
@@ -206,6 +338,11 @@ function parseParking(apartment: string, rawValue: unknown): ParkingGuideData {
     mapUrl: stringValue('mapUrl', fallback.mapUrl),
     noteVi: stringValue('noteVi', fallback.noteVi),
     noteEn: stringValue('noteEn', fallback.noteEn),
+    internalNoteVi: stringValue('internalNoteVi', fallback.internalNoteVi),
+    internalNoteEn: stringValue('internalNoteEn', fallback.internalNoteEn),
+    internalEmailTo: stringValue('internalEmailTo', fallback.internalEmailTo),
+    internalEmailSubject: stringValue('internalEmailSubject', fallback.internalEmailSubject),
+    internalEmailBody: stringValue('internalEmailBody', fallback.internalEmailBody),
     instructionsVi: stepsValue('instructionsVi', fallback.instructionsVi),
     instructionsEn: stepsValue('instructionsEn', fallback.instructionsEn),
     messageVi: stringValue('messageVi', fallback.messageVi),
@@ -219,7 +356,7 @@ function parseParking(apartment: string, rawValue: unknown): ParkingGuideData {
           storagePath,
           captionVi: String(photo.captionVi || photo.caption || ''),
           captionEn: String(photo.captionEn || photo.caption || ''),
-          url: storagePath === BUILTIN_BLISS_PHOTO ? BLISS_GARAGE_77_IMAGE : '',
+          url: builtinPhotoUrl(storagePath),
         };
       })
       .filter(photo => Boolean(photo.storagePath)),
@@ -266,7 +403,7 @@ function useParkingRecords(active: boolean) {
           parking: {
             ...record.parking,
             photos: await Promise.all(record.parking.photos.map(async photo => {
-              if (photo.storagePath === BUILTIN_BLISS_PHOTO) return { ...photo, url: BLISS_GARAGE_77_IMAGE };
+              if (isBuiltinPhoto(photo.storagePath)) return { ...photo, url: builtinPhotoUrl(photo.storagePath) };
               try {
                 return { ...photo, url: await getDownloadURL(ref(storage, photo.storagePath)) };
               } catch {
@@ -295,6 +432,7 @@ export default function ParkingExtension() {
   const [parkingActive, setParkingActive] = useState(() => new URLSearchParams(location.search).get('tab') === 'parking');
   const [manageActive, setManageActive] = useState(() => new URLSearchParams(location.search).get('tab') === 'manage');
   const [hosts, setHosts] = useState<{ tabs: HTMLElement; content: HTMLElement } | null>(null);
+  const [managerHost, setManagerHost] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const locate = () => {
@@ -322,6 +460,45 @@ export default function ParkingExtension() {
     document.addEventListener('click', handleTabClick);
     return () => document.removeEventListener('click', handleTabClick);
   }, []);
+
+  useEffect(() => {
+    if (!hosts || !canEdit || !manageActive) {
+      setManagerHost(null);
+      document.getElementById('parking-manager-host')?.remove();
+      return;
+    }
+
+    const placeManagerHost = () => {
+      const managementRoot = Array.from(hosts.content.children)
+        .find(element => element instanceof HTMLElement && element.classList.contains('space-y-5')) as HTMLElement | undefined;
+      if (!managementRoot) return;
+
+      let mount = document.getElementById('parking-manager-host') as HTMLElement | null;
+      if (!mount) {
+        mount = document.createElement('div');
+        mount.id = 'parking-manager-host';
+        mount.dataset.parkingManagerHost = 'true';
+      }
+
+      const accessSection = Array.from(managementRoot.querySelectorAll(':scope > section'))
+        .find(section => section.textContent?.includes('Quyền truy cập')) as HTMLElement | undefined;
+
+      if (accessSection) {
+        if (mount.parentElement !== managementRoot || mount.nextElementSibling !== accessSection) {
+          managementRoot.insertBefore(mount, accessSection);
+        }
+      } else if (mount.parentElement !== managementRoot) {
+        managementRoot.appendChild(mount);
+      }
+
+      setManagerHost(current => current === mount ? current : mount);
+    };
+
+    placeManagerHost();
+    const observer = new MutationObserver(placeManagerHost);
+    observer.observe(hosts.content, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [canEdit, hosts, manageActive]);
 
   useEffect(() => {
     if (parkingActive) {
@@ -363,11 +540,11 @@ export default function ParkingExtension() {
       hosts.content,
     )}
 
-    {canEdit && manageActive && createPortal(
-      <div data-parking-manager="true" className="mt-5">
+    {canEdit && manageActive && managerHost && createPortal(
+      <div data-parking-manager="true">
         <ParkingManager records={records} loading={loading} error={error} />
       </div>,
-      hosts.content,
+      managerHost,
     )}
 
     <style>{`
@@ -629,6 +806,7 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [internalEmailCopied, setInternalEmailCopied] = useState(false);
   const pendingRef = useRef<PendingPhoto[]>([]);
 
   useEffect(() => { pendingRef.current = pendingPhotos; }, [pendingPhotos]);
@@ -650,7 +828,7 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
 
   const removeExistingPhoto = (index: number) => {
     const photo = working.photos[index];
-    if (photo && photo.storagePath !== BUILTIN_BLISS_PHOTO) setRemovedPaths(current => [...current, photo.storagePath]);
+    if (photo && !isBuiltinPhoto(photo.storagePath)) setRemovedPaths(current => [...current, photo.storagePath]);
     update('photos', working.photos.filter((_, photoIndex) => photoIndex !== index));
   };
 
@@ -689,6 +867,11 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
         mapUrl: working.mapUrl.trim(),
         noteVi: working.noteVi.trim(),
         noteEn: working.noteEn.trim(),
+        internalNoteVi: working.internalNoteVi.trim(),
+        internalNoteEn: working.internalNoteEn.trim(),
+        internalEmailTo: working.internalEmailTo.trim(),
+        internalEmailSubject: working.internalEmailSubject.trim(),
+        internalEmailBody: working.internalEmailBody.trim(),
         instructionsVi: textToSteps(viSteps),
         instructionsEn: textToSteps(enSteps),
         messageVi: working.messageVi.trim(),
@@ -702,7 +885,7 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
         updatedBy: auth.currentUser?.email?.toLocaleLowerCase() || '',
       }, { merge: true });
 
-      await Promise.allSettled(removedPaths.filter(path => path && path !== BUILTIN_BLISS_PHOTO).map(path => deleteObject(ref(storage, path))));
+      await Promise.allSettled(removedPaths.filter(path => path && !isBuiltinPhoto(path)).map(path => deleteObject(ref(storage, path))));
       pendingPhotos.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
       setPendingPhotos([]);
       setRemovedPaths([]);
@@ -716,6 +899,18 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
     } finally {
       setSaving(false);
     }
+  };
+
+  const copyInternalEmail = async () => {
+    const content = [
+      working.internalEmailTo ? `To: ${working.internalEmailTo}` : '',
+      working.internalEmailSubject ? `Subject: ${working.internalEmailSubject}` : '',
+      working.internalEmailBody,
+    ].filter(Boolean).join('\n\n');
+    if (!content) return;
+    await navigator.clipboard.writeText(content);
+    setInternalEmailCopied(true);
+    window.setTimeout(() => setInternalEmailCopied(false), 1800);
   };
 
   return (
@@ -749,6 +944,23 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
         <TextArea label="🇬🇧 Important note" value={working.noteEn} onChange={value => update('noteEn', value)} rows={5} />
       </FormSection>
 
+      <FormSection title="Internal operations · not shown to guests">
+        <div className="col-span-full rounded-xl border border-violet-200 bg-violet-50/70 p-3 text-[10px] leading-5 text-violet-800 dark:border-violet-900 dark:bg-violet-950/20 dark:text-violet-300">
+          Nội dung trong khu vực này chỉ dành cho đội vận hành. Parking Guide ở tab dành cho khách sẽ không hiển thị ghi chú hoặc email nội bộ.
+        </div>
+        <TextArea label="🇻🇳 Ghi chú nội bộ" value={working.internalNoteVi} onChange={value => update('internalNoteVi', value)} rows={5} />
+        <TextArea label="🇬🇧 Internal note" value={working.internalNoteEn} onChange={value => update('internalNoteEn', value)} rows={5} />
+        <Field label="Internal email recipient" value={working.internalEmailTo} onChange={value => update('internalEmailTo', value)} />
+        <Field label="Internal email subject" value={working.internalEmailSubject} onChange={value => update('internalEmailSubject', value)} />
+        <div className="col-span-full">
+          <TextArea label="Internal email template" helper="Use placeholders such as [CAR PLATE], [CHECK-IN DATE] and [CHECK-OUT DATE] before sending." value={working.internalEmailBody} onChange={value => update('internalEmailBody', value)} rows={13} />
+          <button type="button" onClick={() => void copyInternalEmail()} disabled={!working.internalEmailTo && !working.internalEmailSubject && !working.internalEmailBody} className={`mt-2 inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-[9px] font-extrabold transition disabled:opacity-40 ${internalEmailCopied ? 'bg-emerald-600 text-white' : 'bg-violet-600 text-white hover:bg-violet-700'}`}>
+            {internalEmailCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {internalEmailCopied ? 'Internal email copied' : 'Copy internal email'}
+          </button>
+        </div>
+      </FormSection>
+
       <FormSection title="Step-by-step parking instructions">
         <div className="col-span-full rounded-xl border border-orange-100 bg-orange-50/60 p-3 text-[10px] leading-5 text-orange-800 dark:border-orange-900 dark:bg-orange-950/20 dark:text-orange-300">Mỗi bước cách nhau bằng một dòng trống, giống Apartment Check-in. Nội dung VI và EN được Copy theo nút ngôn ngữ hiện tại.</div>
         <TextArea label="🇻🇳 HƯỚNG DẪN ĐẬU XE TIẾNG VIỆT" helper="Chừa một dòng trống giữa hai bước." value={viSteps} onChange={value => { setViSteps(value); update('instructionsVi', textToSteps(value)); }} rows={9} />
@@ -765,7 +977,7 @@ function ParkingEditor({ record, onSaved }: { key?: string; record: ParkingRecor
           {working.photos.map((photo, index) => (
             <ParkingPhotoEditor
               key={`${photo.storagePath}:${index}`}
-              src={photo.url || (photo.storagePath === BUILTIN_BLISS_PHOTO ? BLISS_GARAGE_77_IMAGE : '')}
+              src={photo.url || builtinPhotoUrl(photo.storagePath)}
               captionVi={photo.captionVi}
               captionEn={photo.captionEn}
               onCaptionVi={value => update('photos', working.photos.map((item, photoIndex) => photoIndex === index ? { ...item, captionVi: value } : item))}
