@@ -1468,6 +1468,12 @@ export default function ParkingExtension() {
   }, [canEdit, hosts, manageActive]);
 
   useEffect(() => {
+    if (!hosts) return;
+    hosts.tabs.classList.add('management-tab-grid');
+    return () => hosts.tabs.classList.remove('management-tab-grid');
+  }, [hosts]);
+
+  useEffect(() => {
     if (parkingActive) {
       document.documentElement.dataset.parkingActive = 'true';
       const url = new URL(location.href);
@@ -1522,6 +1528,48 @@ export default function ParkingExtension() {
     <style>{`
       #tab-parking{order:98}
       #tab-manage{order:99}
+
+      .management-tab-grid{
+        display:grid!important;
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+        align-items:stretch!important;
+        gap:.75rem!important;
+      }
+      .management-tab-grid>button{
+        width:100%!important;
+        min-width:0!important;
+        min-height:3.75rem!important;
+        padding:.75rem .625rem!important;
+        justify-content:center!important;
+        text-align:center!important;
+        line-height:1.2!important;
+        transform:none!important;
+      }
+      .management-tab-grid>button:hover{
+        transform:translateY(-1px)!important;
+      }
+      .management-tab-grid>button:active{
+        transform:translateY(0)!important;
+      }
+      .management-tab-grid>button>span{
+        min-width:0!important;
+        max-width:100%!important;
+        white-space:normal!important;
+        overflow:visible!important;
+        text-overflow:clip!important;
+        justify-content:center!important;
+        line-height:1.25!important;
+      }
+      @media(min-width:640px){
+        .management-tab-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+      }
+      @media(min-width:1024px){
+        .management-tab-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+      }
+      @media(min-width:1280px){
+        .management-tab-grid{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+      }
+
       html[data-parking-active='true'] [data-app-tab-content='true']>:not([data-parking-panel='true']){display:none!important}
       html[data-parking-active='true'] [id^='tab-']:not(#tab-parking){opacity:.62;transform:none!important;filter:saturate(.45)}
     `}</style>
