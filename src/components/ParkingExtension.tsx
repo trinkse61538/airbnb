@@ -132,6 +132,16 @@ const card = 'rounded-2xl border border-slate-100 bg-white shadow-sm dark:border
 const btn = 'inline-flex items-center justify-center gap-1.5 rounded-xl font-extrabold transition';
 const hasOwn = (value: Record<string, unknown>, key: string) => Object.prototype.hasOwnProperty.call(value, key);
 const pick = (lang: Lang, vi: string, en: string) => lang === 'vi' ? vi : en;
+const SUN_LIT_OASIS_APARTMENT = '345/243 pyrmont street - sun-lit oasis | darling harbour';
+const SUN_LIT_OASIS_FORM_URL = 'https://docs.google.com/forms/d/18zHK9YszJAoS5rv-R1o_Ni_5r_Mno-cQ8bz3ZXufcpI/viewform?ts=5bea60fc&edit_requested=true';
+const SUN_LIT_OASIS_PRE_STAY_MESSAGE = `As a quick requirement for this apartment, please fill this in prior to your stay, noting the apartment number as #345. Thanks! It's not too important, but if you have time, it would be best to complete it.
+
+${SUN_LIT_OASIS_FORM_URL}
+
+Once you confirm, we will send your check-in instructions in a few hours. Thanks!
+
+If you have any questions, I’m here to help. Hope you enjoy your stay!`;
+const normalizeApartmentName = (value: string) => value.trim().toLocaleLowerCase().replace(/\s+/g, ' ');
 
 function emptyParking(): ParkingGuideData {
   return {
@@ -1338,8 +1348,10 @@ export default function ParkingExtension() {
   const { records, loading, error } = useParkingRecords(status === 'ready');
   const [parkingActive, setParkingActive] = useState(() => new URLSearchParams(location.search).get('tab') === 'parking');
   const [manageActive, setManageActive] = useState(() => new URLSearchParams(location.search).get('tab') === 'manage');
+  const [checkinActive, setCheckinActive] = useState(() => new URLSearchParams(location.search).get('tab') === 'checkin');
   const [hosts, setHosts] = useState<{ tabs: HTMLElement; content: HTMLElement } | null>(null);
   const [managerHost, setManagerHost] = useState<HTMLElement | null>(null);
+  const [checkinRequirementHost, setCheckinRequirementHost] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const locate = () => {
@@ -1363,10 +1375,51 @@ export default function ParkingExtension() {
       if (!tab) return;
       setParkingActive(tab.id === 'tab-parking');
       setManageActive(tab.id === 'tab-manage');
+      setCheckinActive(tab.id === 'tab-checkin');
     };
     document.addEventListener('click', handleTabClick);
     return () => document.removeEventListener('click', handleTabClick);
   }, []);
+
+  useEffect(() => {
+    if (!hosts || !checkinActive) {
+      setCheckinRequirementHost(null);
+      document.getElementById('sun-lit-oasis-requirement-host')?.remove();
+      return;
+    }
+
+    const placeRequirementHost = () => {
+      const activeHeading = Array.from(hosts.content.querySelectorAll('h3'))
+        .find(heading => normalizeApartmentName(heading.textContent || '') === SUN_LIT_OASIS_APARTMENT) as HTMLElement | undefined;
+
+      if (!activeHeading) {
+        document.getElementById('sun-lit-oasis-requirement-host')?.remove();
+        setCheckinRequirementHost(null);
+        return;
+      }
+
+      const activeSection = activeHeading.closest('section');
+      const activeMain = activeHeading.closest('main');
+      if (!activeSection || !activeMain) return;
+
+      let mount = document.getElementById('sun-lit-oasis-requirement-host') as HTMLElement | null;
+      if (!mount) {
+        mount = document.createElement('div');
+        mount.id = 'sun-lit-oasis-requirement-host';
+        mount.dataset.sunLitOasisRequirementHost = 'true';
+      }
+
+      if (mount.parentElement !== activeMain || activeSection.nextElementSibling !== mount) {
+        activeSection.insertAdjacentElement('afterend', mount);
+      }
+      setCheckinRequirementHost(current => current === mount ? current : mount);
+    };
+
+    placeRequirementHost();
+    const observer = new MutationObserver(placeRequirementHost);
+    observer.observe(hosts.content, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, [checkinActive, hosts]);
 
   useEffect(() => {
     if (!hosts || !canEdit || !manageActive) {
@@ -1426,7 +1479,7 @@ export default function ParkingExtension() {
       <button
         id="tab-parking"
         type="button"
-        onClick={() => { setParkingActive(true); setManageActive(false); }}
+        onClick={() => { setParkingActive(true); setManageActive(false); setCheckinActive(false); }}
         className={`flex items-center justify-center gap-2.5 rounded-xl border px-4 py-3.5 text-xs font-extrabold shadow-xs transition-all sm:text-sm ${
           parkingActive
             ? 'scale-[1.03] border-orange-500 bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20'
@@ -1454,6 +1507,11 @@ export default function ParkingExtension() {
       managerHost,
     )}
 
+    {checkinActive && checkinRequirementHost && createPortal(
+      <SunLitOasisPreStayRequirement />,
+      checkinRequirementHost,
+    )}
+
     <style>{`
       #tab-parking{order:98}
       #tab-manage{order:99}
@@ -1461,6 +1519,53 @@ export default function ParkingExtension() {
       html[data-parking-active='true'] [id^='tab-']:not(#tab-parking){opacity:.62;transform:none!important;filter:saturate(.45)}
     `}</style>
   </>;
+}
+
+function SunLitOasisPreStayRequirement() {
+  const [copied, setCopied] = useState('');
+
+  const copy = async (key: 'message' | 'link', value: string) => {
+    await navigator.clipboard.writeText(value);
+    setCopied(key);
+    window.setTimeout(() => setCopied(current => current === key ? '' : current), 1800);
+  };
+
+  return (
+    <section className="overflow-hidden rounded-2xl border-2 border-sky-200 bg-white shadow-sm dark:border-sky-900 dark:bg-slate-900">
+      <div className="border-b border-sky-100 bg-sky-50/70 p-4 dark:border-sky-900/60 dark:bg-sky-950/20 sm:p-5">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+          <div>
+            <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-sky-600 dark:text-sky-400">Pre-stay requirement · Apartment #345</p>
+            <h3 className="mt-1 text-sm font-extrabold text-slate-900 dark:text-white">Guest registration form</h3>
+            <p className="mt-1 text-[10px] leading-5 text-slate-500 dark:text-slate-400">Copy this message before sending the full check-in instructions.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void copy('message', SUN_LIT_OASIS_PRE_STAY_MESSAGE)}
+            className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-[10px] font-extrabold text-white transition ${copied === 'message' ? 'bg-emerald-600' : 'bg-sky-600 hover:bg-sky-700'}`}
+          >
+            {copied === 'message' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied === 'message' ? 'Message copied' : 'Copy guest message'}
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-3 p-4 sm:p-5">
+        <div className="whitespace-pre-wrap rounded-xl border border-slate-100 bg-slate-50 p-4 text-[11px] leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-300">
+          {SUN_LIT_OASIS_PRE_STAY_MESSAGE}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => void copy('link', SUN_LIT_OASIS_FORM_URL)} className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[9px] font-extrabold text-slate-600 transition hover:border-sky-300 hover:text-sky-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
+            {copied === 'link' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied === 'link' ? 'Form link copied' : 'Copy form link'}
+          </button>
+          <a href={SUN_LIT_OASIS_FORM_URL} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-sky-50 px-3 text-[9px] font-extrabold text-sky-700 transition hover:bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300">
+            <ExternalLink className="h-3.5 w-3.5" /> Open Google Form
+          </a>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function ParkingPanel({ records, loading, error, lang }: { records: ParkingRecord[]; loading: boolean; error: string; lang: Lang }) {
