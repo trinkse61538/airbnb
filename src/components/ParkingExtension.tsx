@@ -1607,6 +1607,9 @@ function ParkingPanel({ records, loading, error, lang }: { records: ParkingRecor
   const guide = record.parking;
   const steps = lang === 'vi' ? guide.instructionsVi : guide.instructionsEn;
   const message = lang === 'vi' ? guide.messageVi : guide.messageEn;
+  const fullStepsText = steps
+    .map((step, index) => `${lang === 'vi' ? 'BƯỚC' : 'STEP'} ${index + 1}\n${stripMarkdown(step)}`)
+    .join('\n\n');
 
   const copyText = async (key: string, value: string) => {
     await navigator.clipboard.writeText(value);
@@ -1776,10 +1779,16 @@ function ParkingPanel({ records, loading, error, lang }: { records: ParkingRecor
               <h3 className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white"><Sparkles className="h-4 w-4 text-orange-500" />{t('Tin nhắn hướng dẫn từng bước', 'Step-by-step guest message')}</h3>
               <p className="mt-1 text-[9px] text-slate-400">{t('Tên căn hộ được lấy trực tiếp từ cùng bản ghi Apartment Check-in.', 'The apartment name comes directly from the same Apartment Check-in record.')}</p>
             </div>
-            <button type="button" onClick={() => void copyText('all', message)} disabled={!message} className={`${btn} h-9 bg-orange-600 px-3 text-[10px] text-white disabled:opacity-40`}>
-              {copied === 'all' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied === 'all' ? t('Đã sao chép tất cả', 'All copied') : t('Sao chép toàn bộ', 'Copy full message')}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => void copyText('all-steps', fullStepsText)} disabled={!fullStepsText} className={`${btn} h-9 border border-orange-200 bg-white px-3 text-[10px] text-orange-700 hover:bg-orange-50 disabled:opacity-40 dark:border-orange-900 dark:bg-slate-900 dark:text-orange-300 dark:hover:bg-orange-950/30`}>
+                {copied === 'all-steps' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied === 'all-steps' ? t('Đã sao chép các bước', 'All steps copied') : t('Sao chép toàn bộ bước', 'Copy full steps')}
+              </button>
+              <button type="button" onClick={() => void copyText('all', message)} disabled={!message} className={`${btn} h-9 bg-orange-600 px-3 text-[10px] text-white disabled:opacity-40`}>
+                {copied === 'all' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied === 'all' ? t('Đã sao chép tin nhắn', 'Full message copied') : t('Sao chép tin nhắn gốc', 'Copy full message')}
+              </button>
+            </div>
           </div>
 
           {steps.length > 0 ? (
