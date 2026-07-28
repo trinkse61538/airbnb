@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apartment-control-pwa-v3-0-15';
+const CACHE_NAME = 'apartment-control-pwa-v3-0-16';
 const CACHE_PREFIX = 'apartment-control-pwa-';
 
 function scopedUrl(path = '') {
