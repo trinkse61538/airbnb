@@ -1389,8 +1389,15 @@ export default function ParkingExtension() {
     }
 
     const placeRequirementHost = () => {
-      const activeHeading = Array.from(hosts.content.querySelectorAll('h3'))
-        .find(heading => normalizeApartmentName(heading.textContent || '') === SUN_LIT_OASIS_APARTMENT) as HTMLElement | undefined;
+      const headings = hosts.content.querySelectorAll<HTMLElement>('h3');
+      let activeHeading: HTMLElement | null = null;
+
+      for (const heading of headings) {
+        if (normalizeApartmentName(heading.textContent ?? '') === SUN_LIT_OASIS_APARTMENT) {
+          activeHeading = heading;
+          break;
+        }
+      }
 
       if (!activeHeading) {
         document.getElementById('sun-lit-oasis-requirement-host')?.remove();
