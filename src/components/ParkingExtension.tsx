@@ -99,6 +99,11 @@ const BUILTIN_GRAND_PYRMONT_PRIVATE_BAY = 'builtin:grand-pyrmont-private-bay';
 const BUILTIN_GRAND_PYRMONT_LANE_DIRECTION = 'builtin:grand-pyrmont-lane-direction';
 const BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE = 'builtin:grand-pyrmont-complex-entrance';
 const BUILTIN_GRAND_PYRMONT_HOUSE_69 = 'builtin:grand-pyrmont-house-69';
+const BUILTIN_BAYSIDE_ENCLAVE_SPOT_CLOSE = 'builtin:bayside-enclave-spot-close';
+const BUILTIN_BAYSIDE_ENCLAVE_SPOT_WIDE = 'builtin:bayside-enclave-spot-wide';
+const BUILTIN_BAYSIDE_ENCLAVE_LEVEL_2_PANORAMA = 'builtin:bayside-enclave-level-2-panorama';
+const BUILTIN_BAYSIDE_ENCLAVE_FOB_GATE = 'builtin:bayside-enclave-fob-gate';
+const BUILTIN_BAYSIDE_ENCLAVE_HARBOURSIDE_ENTRANCE = 'builtin:bayside-enclave-harbourside-entrance';
 const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_BLISS_PHOTO]: BLISS_GARAGE_77_IMAGE,
   [BUILTIN_BLUE_ENCLAVE_KEY_FOB]: publicUrl('parking/blue-enclave-key-fob.jpg'),
@@ -115,6 +120,11 @@ const BUILTIN_PHOTO_URLS: Record<string, string> = {
   [BUILTIN_GRAND_PYRMONT_LANE_DIRECTION]: publicUrl('parking/grand-pyrmont-lane-direction.jpg'),
   [BUILTIN_GRAND_PYRMONT_COMPLEX_ENTRANCE]: publicUrl('parking/grand-pyrmont-complex-entrance.jpg'),
   [BUILTIN_GRAND_PYRMONT_HOUSE_69]: publicUrl('parking/grand-pyrmont-house-69.jpg'),
+  [BUILTIN_BAYSIDE_ENCLAVE_SPOT_CLOSE]: publicUrl('parking/bayside-enclave-spot-close.jpg'),
+  [BUILTIN_BAYSIDE_ENCLAVE_SPOT_WIDE]: publicUrl('parking/bayside-enclave-spot-wide.jpg'),
+  [BUILTIN_BAYSIDE_ENCLAVE_LEVEL_2_PANORAMA]: publicUrl('parking/bayside-enclave-level-2-panorama.jpg'),
+  [BUILTIN_BAYSIDE_ENCLAVE_FOB_GATE]: publicUrl('parking/bayside-enclave-fob-gate.jpg'),
+  [BUILTIN_BAYSIDE_ENCLAVE_HARBOURSIDE_ENTRANCE]: publicUrl('parking/bayside-enclave-harbourside-entrance.jpg'),
 };
 const builtinPhotoUrl = (storagePath: string) => BUILTIN_PHOTO_URLS[storagePath] || '';
 const isBuiltinPhoto = (storagePath: string) => Boolean(BUILTIN_PHOTO_URLS[storagePath]);
@@ -496,6 +506,276 @@ Thank you.`,
     };
   }
 
+
+
+  if (normalized.endsWith('the penthouse on pyrmont')) {
+    return {
+      enabled: true,
+      statusVi: 'Có parking riêng đi kèm',
+      statusEn: 'Private parking included',
+      locationVi: '9 Quarry Master Drive',
+      locationEn: '9 Quarry Master Drive',
+      accessVi: 'Rẽ trái, rồi rẽ trái thêm lần nữa để đến khu parking',
+      accessEn: 'Take a left, then left again to reach the parking area',
+      spot: 'Private parking included',
+      mapUrl: '',
+      noteVi: 'Có parking riêng đi kèm kỳ lưu trú. Visitor parking trong khuôn viên được miễn phí nếu đậu dưới 24 giờ.',
+      noteEn: 'Private parking is included with your stay. Visitor parking on the premises is free of charge for stays under 24 hours.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Căn **${apartment}** có **parking riêng đi kèm** với kỳ lưu trú.',
+        'Ngoài ra, **visitor parking trong khuôn viên** cũng được **miễn phí nếu đậu dưới 24 giờ**.',
+        'Khu parking nằm tại **9 Quarry Master Dr**.',
+        'Để đến bãi xe, hãy **rẽ trái**, sau đó **rẽ trái thêm lần nữa**.',
+      ],
+      instructionsEn: [
+        '**Private parking is included** with your stay at **${apartment}**.',
+        '**Visitor parking on the premises** is also **free of charge if parked for less than 24 hours**.',
+        'Parking is located at **9 Quarry Master Dr**.',
+        'To reach the parking area, **take a left**, then **take a left again**.',
+      ],
+      messageVi: `Xin chào,
+
+Căn **${apartment}** có **parking riêng đi kèm** với kỳ lưu trú. Ngoài ra, **visitor parking trong khuôn viên** cũng được **miễn phí nếu đậu dưới 24 giờ**.
+
+Khu parking nằm tại **9 Quarry Master Dr**. Khi vào khu vực này, hãy **rẽ trái**, sau đó **rẽ trái thêm lần nữa** để đến chỗ đậu xe.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+**Private parking is included** with your stay at **${apartment}**. In addition, **visitor parking on the premises** is **free of charge if parked for less than 24 hours**.
+
+Parking is located at **9 Quarry Master Dr**. To reach the parking area, **take a left**, then **take a left again**.
+
+Thank you.`,
+      photos: [],
+    };
+  }
+
+  if (
+    normalized.endsWith('122 kirribilli · timeless harbour enclave')
+    || normalized.endsWith('122 kirribilli | timeless harbour enclave')
+    || normalized.includes('timeless harbour enclave')
+  ) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe trên đường miễn phí theo khung giờ',
+      statusEn: 'Free street parking at certain times',
+      locationVi: 'Đậu xe trên đường gần căn hộ',
+      locationEn: 'Street parking near the apartment',
+      accessVi: 'Tuân theo biển báo đậu xe trên đường',
+      accessEn: 'Follow the local street parking signs',
+      spot: '',
+      mapUrl: '',
+      noteVi: 'Cuối tuần và sau 4:00 PM ngày thường thường được đậu xe miễn phí không giới hạn. Từ 8:30 AM đến 4:00 PM ngày thường thường có 2 giờ miễn phí. Nếu cần có thể di chuyển xe giữa các ô, nhưng quy định này hiếm khi bị kiểm tra gắt.',
+      noteEn: 'Street parking is generally free and unlimited on weekends and after 4:00 PM on weekdays. Between 8:30 AM and 4:00 PM on weekdays, it is usually free for 2 hours. You may move the car between spots if needed, though it is rarely enforced.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Có thể sử dụng **đậu xe trên đường** gần căn hộ.',
+        'Vào **cuối tuần** và **sau 4:00 PM các ngày trong tuần**, đậu xe thường **miễn phí và không giới hạn**.',
+        'Từ **8:30 AM – 4:00 PM** các ngày trong tuần, đậu xe trên đường thường **miễn phí trong 2 giờ**.',
+        'Nếu cần, bạn có thể **di chuyển xe giữa các vị trí** để tiếp tục đậu, tuy nhiên điều này **hiếm khi bị kiểm tra gắt**.',
+        'Vui lòng luôn kiểm tra biển báo tại nơi đậu xe để xác nhận quy định thực tế.',
+      ],
+      instructionsEn: [
+        'Street parking is available near the apartment.',
+        'On **weekends** and **after 4:00 PM on weekdays**, parking is generally **free and unlimited**.',
+        'Between **8:30 AM and 4:00 PM** on weekdays, street parking is usually **free for 2 hours**.',
+        'If needed, you may **move your car between spots**, although this is **rarely enforced**.',
+        'Please always check the street signs where you park to confirm the current restrictions.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, bạn có thể sử dụng **đậu xe trên đường** gần căn hộ.
+
+- **Cuối tuần** và **sau 4:00 PM ngày thường**: thường **miễn phí và không giới hạn**
+- **8:30 AM – 4:00 PM ngày thường**: thường **miễn phí trong 2 giờ**
+
+Nếu cần, bạn có thể di chuyển xe giữa các vị trí, tuy nhiên điều này hiếm khi bị kiểm tra gắt. Vui lòng luôn kiểm tra biển báo thực tế tại nơi đậu xe.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, street parking is available nearby.
+
+- **Weekends** and **after 4:00 PM on weekdays**: usually **free and unlimited**
+- **8:30 AM – 4:00 PM on weekdays**: usually **free for 2 hours**
+
+If needed, you may move your car between spots, although this is rarely enforced. Please always check the parking signs where you park.
+
+Thank you.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('ultimo chic home | modern 2br')) {
+    return {
+      enabled: true,
+      statusVi: 'Có bãi xe dùng fob tại 486 Jones Street',
+      statusEn: 'Fob-access parking at 486 Jones Street',
+      locationVi: '486 Jones Street',
+      locationEn: '486 Jones Street',
+      accessVi: 'Giữ fob trước gate scanner vài giây để vào bãi xe',
+      accessEn: 'Hold the fob on the gate scanner for a few seconds to enter',
+      spot: '',
+      mapUrl: 'https://maps.app.goo.gl/EG5w38DEWYzdPrp37',
+      noteVi: 'Sau khi vào bãi xe, bạn có thể dùng fire exit door hoặc thang máy gần khu garbage bins / loading area. Lưu ý thang máy có thể đưa bạn sang building kế bên thay vì đúng tòa nhà của căn hộ.',
+      noteEn: 'After entering the car park, you can use either the fire exit door or the lift near the garbage bins/loading area. Please note the lift may take you into the neighbouring building rather than directly into your exact building.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Vui lòng lái xe đến **486 Jones Street**.',
+        'Bản đồ: https://maps.app.goo.gl/EG5w38DEWYzdPrp37',
+        'Giữ **fob** trước **gate scanner** trong **vài giây** để vào bãi xe.',
+        'Sau khi vào bãi xe, bạn có thể dùng **fire exit door** hoặc **thang máy** gần khu **garbage bins / loading area**.',
+        'Lưu ý: thang máy có thể đưa bạn sang **tòa nhà lân cận** chứ không đi thẳng đến đúng building của căn hộ.',
+      ],
+      instructionsEn: [
+        'Please drive to **486 Jones Street**.',
+        'Map: https://maps.app.goo.gl/EG5w38DEWYzdPrp37',
+        'Hold the **fob** on the **gate scanner** for a **few seconds** to enter the car park.',
+        'From there, you can use either the **fire exit door** or the **lift** near the **garbage bins / loading area**.',
+        'Please note that the lift may take you into the **neighbouring building** rather than directly into your exact building.',
+      ],
+      messageVi: `Xin chào,
+
+Đối với căn **${apartment}**, vui lòng lái xe đến **486 Jones Street**:
+https://maps.app.goo.gl/EG5w38DEWYzdPrp37
+
+Giữ **fob** trước **gate scanner** trong vài giây để vào bãi xe. Sau khi vào bên trong, bạn có thể sử dụng **fire exit door** hoặc **thang máy** gần khu **garbage bins / loading area**.
+
+Lưu ý: thang máy có thể đưa bạn sang **tòa nhà lân cận** thay vì đúng building của căn hộ.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+For **${apartment}**, please drive to **486 Jones Street**:
+https://maps.app.goo.gl/EG5w38DEWYzdPrp37
+
+Hold the **fob** on the **gate scanner** for a few seconds to enter the car park. From there, you can use either the **fire exit door** or the **lift** near the **garbage bins / loading area**.
+
+Please note that the lift may take you into the **neighbouring building** rather than directly into your exact building.
+
+Thank you.`,
+      photos: [],
+    };
+  }
+
+  if (normalized.endsWith('bayside enclave | casino & harbour')) {
+    return {
+      enabled: true,
+      statusVi: 'Đậu xe tại Wilsons Parking — Harbourside',
+      statusEn: 'Parking at Wilsons Parking — Harbourside',
+      locationVi: '100 Murray Street, Pyrmont NSW 2009 · Wilsons Parking — Harbourside',
+      locationEn: '100 Murray Street, Pyrmont NSW 2009 · Wilsons Parking — Harbourside',
+      accessVi: 'Dùng apartment fob / access card để quét vào Wilsons Parking rồi đi đến Level 2',
+      accessEn: 'Use the apartment fob / access card to tap into Wilsons Parking, then drive to Level 2',
+      spot: 'Level 2 · hướng cuối bãi · cổng riêng',
+      mapUrl: '',
+      noteVi: 'Chỉ sử dụng đúng bãi xe **Wilsons Parking — Harbourside** tại 100 Murray Street. Fob / access card nằm cùng key set và là cùng loại với apartment fob. Hướng dẫn nhận key sẽ được gửi trong check-in instructions.',
+      noteEn: 'Please use only **Wilsons Parking — Harbourside** at 100 Murray Street. The fob / access card is located with the key set and is the same as the apartment fob. Key access details will be included in the check-in instructions.',
+      internalNoteVi: '',
+      internalNoteEn: '',
+      internalEmailTo: '',
+      internalEmailSubject: '',
+      internalEmailBody: '',
+      instructionsVi: [
+        'Địa chỉ parking là **100 Murray Street, Pyrmont NSW 2009**.',
+        'Chỉ sử dụng đúng bãi xe **Wilsons Parking — Harbourside**.',
+        'Hướng dẫn check-in đầy đủ sẽ được gửi lúc **10:00 AM vào ngày trước khi check-in**. Giờ check-in tiêu chuẩn là **từ 3:00 PM**, trừ khi đã có thỏa thuận khác.',
+        'Sau khi nhận **key set / apartment fob**, dùng **fob / access card** để **quét vào Wilsons Parking**.',
+        'Sau khi vào trong, lái xe đến **Level 2**.',
+        'Tiếp tục đi **về phía cuối bãi** và **tìm cổng** như trong ảnh hướng dẫn.',
+        'Access card này nằm cùng **key set** và là **chính apartment fob**.',
+      ],
+      instructionsEn: [
+        'The parking address is **100 Murray Street, Pyrmont NSW 2009**.',
+        'Please make sure you use only **Wilsons Parking — Harbourside**.',
+        'Your full check-in instructions will be sent at **10:00 AM on the day before check-in**. Standard check-in is from **3:00 PM**, unless otherwise agreed.',
+        'Once you receive the **key set / apartment fob**, use the **fob / access card** to **tap into Wilsons Parking**.',
+        'After entering, drive to **Level 2**.',
+        'Continue towards the **end of the car park** and **look for the gate**, as shown in the reference images.',
+        'This access card is located with the **key set** and is the **same as the apartment fob**.',
+      ],
+      messageVi: `Xin chào,
+
+Dưới đây là thông tin parking cho căn **${apartment}**:
+
+**Địa chỉ bãi xe:**
+100 Murray Street, Pyrmont NSW 2009
+**Wilsons Parking — Harbourside**
+
+Vui lòng chỉ sử dụng đúng bãi xe này.
+
+Hướng dẫn check-in đầy đủ sẽ được gửi lúc **10:00 AM vào ngày trước khi check-in**. Giờ check-in tiêu chuẩn là **từ 3:00 PM**, trừ khi đã có thỏa thuận khác.
+
+Sau khi nhận **key set / apartment fob**, hãy dùng **fob / access card** để quét vào **Wilsons Parking**. Sau đó lái xe lên **Level 2**, đi **về phía cuối bãi** và **tìm cổng** như trong ảnh hướng dẫn.
+
+Access card này nằm cùng **key set** và cũng chính là **apartment fob**.
+
+Cảm ơn bạn.`,
+      messageEn: `Hi,
+
+Please read the parking details below carefully for **${apartment}**.
+
+**Parking address:**
+100 Murray Street, Pyrmont NSW 2009
+**Wilsons Parking — Harbourside**
+
+Please make sure you only use this car park.
+
+Your full check-in instructions will be sent at **10:00 AM on the day before check-in**. Standard check-in is from **3:00 PM**, unless we have agreed otherwise.
+
+Once you receive your **key set / apartment fob**, use the **fob / access card** to tap into **Wilsons Parking**. After entering, drive to **Level 2**, continue towards the **end**, and **look for the gate** as shown in the reference images.
+
+This access card is located with the **key set**, and is the **same as the apartment fob**.
+
+Thank you.`,
+      photos: [
+        {
+          storagePath: BUILTIN_BAYSIDE_ENCLAVE_HARBOURSIDE_ENTRANCE,
+          captionVi: 'Lối vào Wilsons Parking — Harbourside tại 100 Murray Street.',
+          captionEn: 'Entrance to Wilsons Parking — Harbourside at 100 Murray Street.',
+          url: builtinPhotoUrl(BUILTIN_BAYSIDE_ENCLAVE_HARBOURSIDE_ENTRANCE),
+        },
+        {
+          storagePath: BUILTIN_BAYSIDE_ENCLAVE_FOB_GATE,
+          captionVi: 'Dùng fob / access card để quét tại cổng vào bãi xe.',
+          captionEn: 'Use the fob / access card at the entry gate scanner.',
+          url: builtinPhotoUrl(BUILTIN_BAYSIDE_ENCLAVE_FOB_GATE),
+        },
+        {
+          storagePath: BUILTIN_BAYSIDE_ENCLAVE_LEVEL_2_PANORAMA,
+          captionVi: 'Tổng quan khu Level 2 và hướng di chuyển về cuối bãi.',
+          captionEn: 'Overview of Level 2 and the direction towards the far end of the car park.',
+          url: builtinPhotoUrl(BUILTIN_BAYSIDE_ENCLAVE_LEVEL_2_PANORAMA),
+        },
+        {
+          storagePath: BUILTIN_BAYSIDE_ENCLAVE_SPOT_WIDE,
+          captionVi: 'Ảnh rộng chỉ hướng đến vị trí / khu cổng ở cuối Level 2.',
+          captionEn: 'Wider reference image showing the direction to the spot / gate at the end of Level 2.',
+          url: builtinPhotoUrl(BUILTIN_BAYSIDE_ENCLAVE_SPOT_WIDE),
+        },
+        {
+          storagePath: BUILTIN_BAYSIDE_ENCLAVE_SPOT_CLOSE,
+          captionVi: 'Ảnh cận vị trí đậu xe tham chiếu tại khu vực cuối Level 2.',
+          captionEn: 'Close-up reference of the parking position near the far end of Level 2.',
+          url: builtinPhotoUrl(BUILTIN_BAYSIDE_ENCLAVE_SPOT_CLOSE),
+        },
+      ],
+    };
+  }
 
 
   if (
