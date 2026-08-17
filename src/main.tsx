@@ -6,6 +6,7 @@ import { ApartmentDataProvider } from './data/ApartmentDataProvider.tsx';
 import { registerPWA } from './pwa.ts';
 import { LanguageProvider } from './i18n.tsx';
 import ParkingExtension from './components/ParkingExtension.tsx';
+import SafeGuideSelectionGuard from './components/SafeGuideSelectionGuard.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
       <ApartmentDataProvider>
         <App />
         <ParkingExtension />
+        <SafeGuideSelectionGuard />
       </ApartmentDataProvider>
     </LanguageProvider>
   </StrictMode>,
