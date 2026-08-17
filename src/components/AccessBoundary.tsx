@@ -38,7 +38,9 @@ export default function AccessBoundary({
     return (
       <div className="py-24 text-center">
         <Loader2 className="mx-auto h-10 w-10 animate-spin text-indigo-600" />
-        <p className="mt-3 text-xs font-semibold text-slate-500">Checking account access and loading apartment data…</p>
+        <p className="mt-3 text-xs font-semibold text-slate-500">
+          {status === 'checking-access' ? 'Checking account access…' : 'Loading apartment data…'}
+        </p>
       </div>
     );
   }
@@ -56,17 +58,27 @@ export default function AccessBoundary({
     );
   }
 
+  const isSlowConnection = error.toLocaleLowerCase().includes('taking too long');
+
   return (
     <div className="mx-auto max-w-2xl py-10 sm:py-16">
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/20 sm:p-6">
         <div className="flex items-start gap-3">
           {error.includes('Firestore') ? <Database className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" /> : <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />}
           <div>
-            <h2 className="text-sm font-extrabold text-amber-950 dark:text-amber-200">Firebase database setup required</h2>
+            <h2 className="text-sm font-extrabold text-amber-950 dark:text-amber-200">
+              {isSlowConnection ? 'Connection is taking longer than expected' : 'Firebase database setup required'}
+            </h2>
             <p className="mt-2 text-xs leading-5 text-amber-800 dark:text-amber-300">{error || 'Unable to load Firebase data.'}</p>
-            <p className="mt-3 text-[10px] leading-5 text-amber-700 dark:text-amber-400">Create Cloud Firestore and Cloud Storage, publish the included rules, then reload this page.</p>
+            <p className="mt-3 text-[10px] leading-5 text-amber-700 dark:text-amber-400">
+              {isSlowConnection
+                ? 'The Firebase listener is still allowed to recover automatically. You can wait a moment or reload the app to reconnect immediately.'
+                : 'Create Cloud Firestore and Cloud Storage, publish the included rules, then reload this page.'}
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" onClick={() => window.location.reload()} className="h-10 rounded-xl bg-amber-600 px-4 text-[10px] font-extrabold text-white">Reload app</button>
+              <button type="button" onClick={() => window.location.reload()} className="h-10 rounded-xl bg-amber-600 px-4 text-[10px] font-extrabold text-white">
+                {isSlowConnection ? 'Reconnect now' : 'Reload app'}
+              </button>
               <button type="button" onClick={onLogout} className="inline-flex h-10 items-center gap-2 rounded-xl border border-amber-300 px-4 text-[10px] font-extrabold text-amber-800 dark:border-amber-800 dark:text-amber-300"><LogOut className="h-3.5 w-3.5" /> Sign out</button>
             </div>
           </div>
