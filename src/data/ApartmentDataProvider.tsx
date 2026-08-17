@@ -171,49 +171,52 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
     let active = true;
     let unsubscribeAccess = () => {};
 
-    const checkAccess = async () => {
-      try {
-        if (email === PRIMARY_ADMIN_EMAIL) await ensureInitialAccessAccounts();
+    // The Firestore rules already grant PRIMARY_ADMIN_EMAIL direct admin access.
+    // Do not block startup on five sequential seed reads/writes. Seed in the
+    // background and start loading apartments immediately.
+    if (email === PRIMARY_ADMIN_EMAIL) {
+      setRole('admin');
+      setStatus('loading');
+      setError('');
+
+      void ensureInitialAccessAccounts().catch(seedError => {
+        console.warn('Unable to seed initial access accounts:', seedError);
+      });
+
+      return () => {
+        active = false;
+      };
+    }
+
+    unsubscribeAccess = onSnapshot(
+      doc(db, 'access', email),
+      snapshot => {
         if (!active) return;
+        const value = snapshot.data();
+        const nextRole = value?.active !== false && isRole(value?.role)
+          ? value.role
+          : null;
 
-        unsubscribeAccess = onSnapshot(
-          doc(db, 'access', email),
-          snapshot => {
-            if (!active) return;
-            const value = snapshot.data();
-            const nextRole = email === PRIMARY_ADMIN_EMAIL
-              ? 'admin'
-              : value?.active !== false && isRole(value?.role)
-                ? value.role
-                : null;
+        if (!snapshot.exists() || !nextRole) {
+          setRole(null);
+          setStatus('unauthorized');
+          setError('');
+          return;
+        }
 
-            if ((!snapshot.exists() && email !== PRIMARY_ADMIN_EMAIL) || !nextRole) {
-              setRole(null);
-              setStatus('unauthorized');
-              setError('');
-              return;
-            }
-
-            setRole(previousRole => {
-              setStatus(previousRole === nextRole ? 'ready' : 'loading');
-              return nextRole;
-            });
-            setError('');
-          },
-          snapshotError => {
-            if (!active) return;
-            setStatus('error');
-            setError(friendlyFirebaseError(snapshotError));
-          },
-        );
-      } catch (accessError) {
+        setRole(previousRole => {
+          setStatus(previousRole === nextRole ? 'ready' : 'loading');
+          return nextRole;
+        });
+        setError('');
+      },
+      snapshotError => {
         if (!active) return;
         setStatus('error');
-        setError(friendlyFirebaseError(accessError));
-      }
-    };
+        setError(friendlyFirebaseError(snapshotError));
+      },
+    );
 
-    void checkAccess();
     return () => {
       active = false;
       unsubscribeAccess();
@@ -224,11 +227,24 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
     if (!user || !role) return;
     let active = true;
     let hydrationVersion = 0;
+    let initialSnapshotReceived = false;
+
+    setStatus('loading');
+
+    const apartmentsTimeout = window.setTimeout(() => {
+      if (!active || initialSnapshotReceived) return;
+      setStatus('error');
+      setError(
+        'Loading apartment data is taking too long. Firestore will keep retrying automatically. Check your connection or reload the app.',
+      );
+    }, 10000);
 
     const unsubscribeApartments = onSnapshot(
       collection(db, 'apartments'),
       snapshot => {
         if (!active) return;
+        initialSnapshotReceived = true;
+        window.clearTimeout(apartmentsTimeout);
         const version = ++hydrationVersion;
         const rawApartments = snapshot.docs
           .map(apartmentDoc => emptyApartment(apartmentDoc.id, apartmentDoc.data() as Partial<ManagedApartment>))
@@ -261,6 +277,7 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
       },
       snapshotError => {
         if (!active) return;
+        window.clearTimeout(apartmentsTimeout);
         setStatus('error');
         setError(friendlyFirebaseError(snapshotError));
       },
@@ -268,6 +285,7 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
 
     return () => {
       active = false;
+      window.clearTimeout(apartmentsTimeout);
       unsubscribeApartments();
     };
   }, [role, user]);
