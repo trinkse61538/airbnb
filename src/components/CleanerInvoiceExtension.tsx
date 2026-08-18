@@ -150,7 +150,7 @@ function loadDraft(): InvoiceDraft {
             id: String(line.id || crypto.randomUUID()),
             apartmentId: String(line.apartmentId || ''),
             apartment: String(line.apartment || ''),
-            serviceDates: Array.isArray(line.serviceDates) ? line.serviceDates.map(String) : [],
+            serviceDates: Array.isArray(line.serviceDates) ? line.serviceDates.map(String).sort() : [],
             shifts: Number(line.shifts) || 0,
             unitPrice: Number(line.unitPrice) || 0,
           })).filter(line => line.apartment && line.shifts > 0 && line.unitPrice > 0)
@@ -216,7 +216,7 @@ function parseServiceDays(input: string, invoiceMonth: string): {
     dates.push(`${yearRaw}-${monthRaw}-${String(day).padStart(2, '0')}`);
   }
 
-  return { dates, tokenCount: tokens.length, invalid };
+  return { dates: dates.sort(), tokenCount: tokens.length, invalid };
 }
 
 function computeServicePeriod(lines: InvoiceLine[]): string {
@@ -395,8 +395,8 @@ export default function CleanerInvoiceExtension() {
     )}
 
     <style>{`
-      #tab-cleaner-invoice{order:97}
-      #tab-parking{order:98}
+      #tab-parking{order:97}
+      #tab-cleaner-invoice{order:98}
       #tab-manage{order:99}
       @media(min-width:1280px){
         .management-tab-grid{grid-template-columns:repeat(8,minmax(0,1fr))!important}
@@ -416,7 +416,7 @@ function CleanerInvoicePanel({ records, loading, error, lang }: {
   const [draft, setDraft] = useState<InvoiceDraft>(() => loadDraft());
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState('');
-  const [shifts, setShifts] = useState(1);
+  const [shifts, setShifts] = useState<number | ''>(1);
   const [serviceDays, setServiceDays] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
   const [notice, setNotice] = useState('');
@@ -442,7 +442,7 @@ function CleanerInvoicePanel({ records, loading, error, lang }: {
     () => parseServiceDays(serviceDays, draft.invoiceMonth),
     [draft.invoiceMonth, serviceDays],
   );
-  const serviceCountMatches = parsedDays.tokenCount === shifts && parsedDays.invalid.length === 0 && shifts > 0;
+  const serviceCountMatches = typeof shifts === 'number' && shifts > 0 && parsedDays.tokenCount === shifts && parsedDays.invalid.length === 0;
   const servicePeriod = useMemo(() => computeServicePeriod(draft.lines), [draft.lines]);
   const grandTotal = useMemo(
     () => draft.lines.reduce((sum, line) => sum + line.shifts * line.unitPrice, 0),
@@ -464,8 +464,8 @@ function CleanerInvoicePanel({ records, loading, error, lang }: {
     }
     if (!serviceCountMatches) {
       setNotice(t(
-        `Bạn đã nhập ${shifts} shift nhưng có ${parsedDays.tokenCount} service date. Hãy kiểm tra lại trước khi thêm vào invoice.`,
-        `You entered ${shifts} shift(s) but ${parsedDays.tokenCount} service date(s). Please check before adding to the invoice.`,
+        `Bạn đã nhập ${shifts || 0} shift nhưng có ${parsedDays.tokenCount} service date. Hãy kiểm tra lại trước khi thêm vào invoice.`,
+        `You entered ${shifts || 0} shift(s) but ${parsedDays.tokenCount} service date(s). Please check before adding to the invoice.`,
       ));
       return;
     }
@@ -483,7 +483,7 @@ function CleanerInvoicePanel({ records, loading, error, lang }: {
           apartmentId: selected.id,
           apartment: selected.apartment,
           serviceDates: parsedDays.dates,
-          shifts,
+          shifts: Number(shifts),
           unitPrice: Math.round(parsedPrice * 100) / 100,
         },
       ],
@@ -618,7 +618,7 @@ function CleanerInvoicePanel({ records, loading, error, lang }: {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <NumberField label={t('Số shifts', 'Shifts')} value={shifts} min={1} step={1} onChange={value => setShifts(Math.max(1, Math.floor(value || 1)))} />
+              <NumberField label={t('Số shifts', 'Shifts')} value={shifts} min={1} step={1} onChange={value => setShifts(value === '' ? '' : Math.max(1, Math.floor(value)))} />
               <MoneyField label="Unit Price (AUD)" value={unitPrice} onChange={setUnitPrice} placeholder={selected?.unitPrice ? String(selected.unitPrice) : '0'} />
             </div>
 
@@ -858,8 +858,8 @@ function MonthField({ label, value, onChange }: { label: string; value: string; 
   return <label><span className="mb-1.5 block text-[9px] font-extrabold uppercase tracking-wider text-slate-500">{label}</span><input type="month" value={value} onChange={event => onChange(event.target.value)} className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-cyan-500 dark:border-slate-700 dark:bg-slate-950" /></label>;
 }
 
-function NumberField({ label, value, onChange, min, step }: { label: string; value: number; onChange: (value: number) => void; min: number; step: number }) {
-  return <label><span className="mb-1.5 block text-[9px] font-extrabold uppercase tracking-wider text-slate-500">{label}</span><input type="number" min={min} step={step} value={value} onChange={event => onChange(Number(event.target.value))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-base font-extrabold outline-none focus:border-cyan-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 md:text-xs" /></label>;
+function NumberField({ label, value, onChange, min, step }: { label: string; value: number | ''; onChange: (value: number | '') => void; min: number; step: number }) {
+  return <label><span className="mb-1.5 block text-[9px] font-extrabold uppercase tracking-wider text-slate-500">{label}</span><input type="number" min={min} step={step} value={value} onChange={event => onChange(event.target.value === '' ? '' : Number(event.target.value))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-base font-extrabold outline-none focus:border-cyan-500 focus:bg-white dark:border-slate-700 dark:bg-slate-950 md:text-xs" /></label>;
 }
 
 function MoneyField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (value: string) => void; placeholder: string }) {
