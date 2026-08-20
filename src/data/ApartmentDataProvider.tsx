@@ -16,7 +16,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { getDownloadURL, ref } from 'firebase/storage';
-import { auth, db, storage } from '../firebase';
+import { auth, db, defaultDb, storage } from '../firebase';
 import type { SecurePayload } from '../secure/types';
 import { INITIAL_ACCESS_ACCOUNTS, PRIMARY_ADMIN_EMAIL, normalizeEmail } from './accessConfig';
 import type {
@@ -315,6 +315,21 @@ export function ApartmentDataProvider({ children }: { children: ReactNode }) {
             return first.email.localeCompare(second.email);
           });
         setAccessAccounts(accounts);
+
+        // Storage Rules can only read authorization data from the default
+        // Firestore database. Keep a mirror of every access account there.
+        void Promise.all(accounts.map(account => setDoc(
+          doc(defaultDb, 'access', account.email),
+          {
+            email: account.email,
+            role: account.role,
+            active: account.active,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        ))).catch(mirrorError => {
+          console.warn('Unable to sync Storage access mirror:', mirrorError);
+        });
       },
       snapshotError => setError(friendlyFirebaseError(snapshotError)),
     );

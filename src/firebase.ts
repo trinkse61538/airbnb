@@ -6,6 +6,9 @@ import firebaseConfig from '../firebase-applet-config.json';
 
 export const app = initializeApp(firebaseConfig);
 export const auth: Auth = getAuth(app);
+// Storage Security Rules can only consult the default Firestore database.
+// Keep a small access-role mirror there while apartment data remains in `airbnb`.
+export const defaultDb = getFirestore(app);
 // This Firebase project uses the named Firestore database created in Console.
 // Keep this in sync with the database selector shown on the Firestore page.
 export const db = getFirestore(app, 'airbnb');

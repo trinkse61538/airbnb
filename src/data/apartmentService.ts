@@ -9,7 +9,7 @@ import {
   ref,
   uploadBytes,
 } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { db, defaultDb, storage } from '../firebase';
 import { PRIMARY_ADMIN_EMAIL, normalizeEmail } from './accessConfig';
 import type { AccessRole, ManagedApartment, ManagedPhoto } from './types';
 
@@ -110,12 +110,22 @@ export async function saveAccessAccount(email: string, role: AccessRole): Promis
     throw new Error('Please enter a valid email address.');
   }
   const enforcedRole = normalized === PRIMARY_ADMIN_EMAIL ? 'admin' : role;
-  await setDoc(doc(db, 'access', normalized), {
+  const accessData = {
     email: normalized,
     role: enforcedRole,
     active: true,
-    updatedAt: serverTimestamp(),
-  }, { merge: true });
+  };
+
+  await Promise.all([
+    setDoc(doc(db, 'access', normalized), {
+      ...accessData,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+    setDoc(doc(defaultDb, 'access', normalized), {
+      ...accessData,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  ]);
 }
 
 export async function removeAccessAccount(email: string): Promise<void> {
@@ -123,6 +133,9 @@ export async function removeAccessAccount(email: string): Promise<void> {
   if (normalized === PRIMARY_ADMIN_EMAIL) {
     throw new Error('The primary admin account cannot be removed.');
   }
-  await deleteDoc(doc(db, 'access', normalized));
+  await Promise.all([
+    deleteDoc(doc(db, 'access', normalized)),
+    deleteDoc(doc(defaultDb, 'access', normalized)),
+  ]);
 }
 
