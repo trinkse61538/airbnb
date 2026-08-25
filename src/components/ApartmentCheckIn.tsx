@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { useApartmentData } from '../data/ApartmentDataProvider';
+import { findAgentInfo, type AirbnbPermission } from '../data/agentInfo';
 import { CheckInPhoto } from '../secure/types';
 import { useUiLanguage } from '../i18n';
 
@@ -58,6 +59,7 @@ export default function ApartmentCheckIn() {
   }, [query, records]);
 
   const activeRecord = records.find(record => record.id === activeId) || records[0];
+  const agentInfo = activeRecord ? findAgentInfo(activeRecord.apartment) : null;
   const viSteps = activeRecord ? data?.instructionsVi[activeRecord.id] ?? [] : [];
   const enSteps = activeRecord ? data?.instructionsEn[activeRecord.id] ?? [] : [];
   const displayedSteps = buildSteps(language, viSteps, enSteps);
@@ -88,6 +90,24 @@ export default function ApartmentCheckIn() {
     await navigator.clipboard.writeText(text);
     setCopiedKey(key);
     window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
+  };
+
+  const copyAgentEmail = async () => {
+    if (!agentInfo?.email) return;
+
+    if (agentInfo.overallPermission === 'not-allowed') {
+      const blockedBy = [
+        agentInfo.agentPermission === 'not-allowed' ? 'Agent' : '',
+        agentInfo.strataPermission === 'not-allowed' ? 'Strata' : '',
+      ].filter(Boolean).join(' + ');
+      const proceed = window.confirm(text(
+        `⚠️ CẢNH BÁO AIRBNB\n\n${agentInfo.address} đang được đánh dấu KHÔNG CHO PHÉP AIRBNB (${blockedBy}).${agentInfo.note ? `\n\n${agentInfo.note}` : ''}\n\nBạn vẫn muốn sao chép email agent?`,
+        `⚠️ AIRBNB WARNING\n\n${agentInfo.address} is marked as NOT ALLOWING AIRBNB (${blockedBy}).${agentInfo.note ? `\n\n${agentInfo.note}` : ''}\n\nDo you still want to copy the agent email?`,
+      ));
+      if (!proceed) return;
+    }
+
+    await copyText('agent-email', agentInfo.email);
   };
 
   const copyPhoto = async (photo: CheckInPhoto, index: number) => {
@@ -170,7 +190,9 @@ export default function ApartmentCheckIn() {
           </div>
 
           <div className="max-h-[55vh] space-y-1.5 overflow-y-auto p-2 lg:max-h-[calc(100vh-210px)]">
-            {filteredRecords.map(record => (
+            {filteredRecords.map(record => {
+              const recordAgentInfo = findAgentInfo(record.apartment);
+              return (
               <button
                 key={record.id}
                 type="button"
@@ -189,10 +211,16 @@ export default function ApartmentCheckIn() {
                 <span className="min-w-0 flex-1">
                   <span className="line-clamp-2 text-[10px] font-extrabold leading-4">{record.apartment}</span>
                   {record.lockboxType && <span className="mt-0.5 block truncate text-[9px] opacity-60">{record.lockboxType}</span>}
+                  {recordAgentInfo?.overallPermission === 'not-allowed' && (
+                    <span className="mt-1 inline-flex rounded-full bg-rose-600 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wide text-white">
+                      No Airbnb
+                    </span>
+                  )}
                 </span>
                 <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-50" />
               </button>
-            ))}
+              );
+            })}
             {filteredRecords.length === 0 && (
               <p className="p-6 text-center text-[10px] text-slate-400">No matching apartment.</p>
             )}
@@ -248,6 +276,63 @@ export default function ApartmentCheckIn() {
                     </a>
                   )}
                 </div>
+              </div>
+            )}
+            {agentInfo && (
+              <div className={`sm:col-span-2 rounded-xl border p-3 ${
+                agentInfo.overallPermission === 'not-allowed'
+                  ? 'border-rose-200 bg-rose-50/70 dark:border-rose-900 dark:bg-rose-950/20'
+                  : 'border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/70'
+              }`}>
+                <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Agent information</p>
+                    <p className="mt-1 text-xs font-extrabold text-slate-800 dark:text-slate-200">{agentInfo.agency}</p>
+                    <p className="mt-0.5 break-all text-[10px] text-slate-500 dark:text-slate-400">
+                      {agentInfo.email || 'Email not provided in the source sheet'}
+                    </p>
+                    <p className="mt-1 text-[9px] text-slate-400">{agentInfo.address}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void copyText('agent-name', agentInfo.agency)}
+                      className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-[9px] font-bold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                    >
+                      {copiedKey === 'agent-name' ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                      {copiedKey === 'agent-name' ? 'Name copied' : 'Copy name'}
+                    </button>
+                    {agentInfo.email && (
+                      <button
+                        type="button"
+                        onClick={() => void copyAgentEmail()}
+                        className={`inline-flex h-8 items-center gap-1 rounded-lg border px-2 text-[9px] font-bold transition ${
+                          agentInfo.overallPermission === 'not-allowed'
+                            ? 'border-rose-200 bg-rose-600 text-white hover:bg-rose-700 dark:border-rose-800'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
+                        }`}
+                      >
+                        {copiedKey === 'agent-email' ? <Check className="h-3 w-3 text-emerald-300" /> : <Copy className="h-3 w-3" />}
+                        {copiedKey === 'agent-email' ? 'Email copied' : 'Copy email'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <PermissionBadge label="Agent" permission={agentInfo.agentPermission} />
+                  <PermissionBadge label="Strata" permission={agentInfo.strataPermission} />
+                </div>
+
+                {agentInfo.overallPermission === 'not-allowed' && (
+                  <div className="mt-3 rounded-lg border border-rose-200 bg-white/70 px-3 py-2 text-[10px] leading-5 text-rose-800 dark:border-rose-900 dark:bg-slate-950/40 dark:text-rose-300">
+                    <p className="font-extrabold">⚠ Airbnb not allowed / not approved</p>
+                    <p>{agentInfo.note || text(
+                      'Ít nhất một trong hai nguồn Agent hoặc Strata đang đánh dấu đỏ. Hãy kiểm tra trước khi liên hệ hoặc xử lý nội dung liên quan Airbnb.',
+                      'At least one of Agent or Strata is marked red. Check this before contacting the agent or handling Airbnb-related communication.',
+                    )}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -377,6 +462,25 @@ function QuickDetail({ label, value, copied, onCopy }: { label: string; value: s
         {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
       </button>
     </div>
+  );
+}
+
+function PermissionBadge({ label, permission }: { label: string; permission: AirbnbPermission }) {
+  const styles = permission === 'allowed'
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300'
+    : permission === 'not-allowed'
+      ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300'
+      : 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300';
+  const status = permission === 'allowed'
+    ? 'Allowed'
+    : permission === 'not-allowed'
+      ? 'Not allowed'
+      : 'Review';
+
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[9px] font-extrabold ${styles}`}>
+      {label}: {status}
+    </span>
   );
 }
 
