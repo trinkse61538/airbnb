@@ -16,6 +16,7 @@ import NotificationCenter from './components/NotificationCenter';
 import CleanerReminder from './components/CleanerReminder';
 import ApartmentWifi from './components/ApartmentWifi';
 import ApartmentCheckIn from './components/ApartmentCheckIn';
+import AvailabilityChecker from './components/AvailabilityChecker';
 import DataManagement from './components/DataManagement';
 import AccessBoundary from './components/AccessBoundary';
 import { NetworkStatus } from './components/PWAControls';
@@ -53,7 +54,7 @@ interface CachedSnapshot {
   syncedAt: string;
 }
 
-type ActiveTab = 'apartments' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'manage';
+type ActiveTab = 'apartments' | 'availability' | 'notifications' | 'remind-cleaner' | 'wifi' | 'checkin' | 'manage';
 
 function readCachedSnapshot(): CachedSnapshot | null {
   try {
@@ -106,7 +107,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const requestedTab = new URLSearchParams(window.location.search).get('tab');
-    return ['apartments', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'manage'].includes(requestedTab || '')
+    return ['apartments', 'availability', 'notifications', 'remind-cleaner', 'wifi', 'checkin', 'manage'].includes(requestedTab || '')
       ? requestedTab as ActiveTab
       : 'apartments';
   });
@@ -515,6 +516,24 @@ export default function App() {
                 </button>
                 
                 <button
+                  onClick={() => setActiveTab('availability')}
+                  id="tab-availability"
+                  className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-150 cursor-pointer border select-none focus:outline-none active:scale-95 shadow-xs ${
+                    activeTab === 'availability'
+                      ? 'bg-gradient-to-r from-cyan-600 to-sky-700 text-white border-cyan-500 shadow-md shadow-cyan-500/20 scale-[1.03]'
+                      : darkMode
+                        ? 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400 hover:text-slate-900 shadow-sm'
+                  }`}
+                >
+                  <span aria-hidden="true" className="text-base leading-none">📅</span>
+                  <span className="truncate">
+                    <span className="inline md:hidden">Availability</span>
+                    <span className="hidden md:inline">Airbnb Availability</span>
+                  </span>
+                </button>
+
+                <button
                   onClick={() => setActiveTab('notifications')}
                   id="tab-notifications"
                   className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-150 cursor-pointer border select-none focus:outline-none active:scale-95 shadow-xs ${
@@ -825,7 +844,9 @@ export default function App() {
                   </div>
                 )
               ) : (
-                activeTab === 'wifi' ? (
+                activeTab === 'availability' ? (
+                  <AvailabilityChecker />
+                ) : activeTab === 'wifi' ? (
                   <ApartmentWifi />
                 ) : activeTab === 'checkin' ? (
                   <ApartmentCheckIn />
